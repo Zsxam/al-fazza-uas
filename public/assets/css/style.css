@@ -23,6 +23,15 @@ body.bg-pastel {
     background-color: #FFE8E8;
 }
 
+body.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--bg-cream); 
+    margin: 0;
+}
+
 /* Navbar */
 .navbar {
     display: flex;
@@ -1231,6 +1240,96 @@ details[open] summary .arrow-icon {
 }
 .hamburger.active span:nth-child(3) {
     transform: translateY(-8px) rotate(-45deg);
+}
+
+/* Login Page */
+.login-card {
+    background-color: var(--white);
+    width: 100%;
+    max-width: 400px;
+    padding: 40px 30px;
+    border-radius: 12px;
+    /* Mengambil gaya shadow dari class .about-us milikmu */
+    box-shadow: 0 8px 20px rgba(166, 124, 82, 0.15); 
+    border: 1px solid #f2e8df;
+    text-align: center;
+}
+
+.login-header h2 {
+    color: var(--dark-brown);
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+    font-weight: 800;
+}
+
+.login-header p {
+    color: #8fa0b5;
+    font-size: 0.95rem;
+    margin-bottom: 30px;
+}
+
+.error-message {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+/* Menggunakan ulang konsep form-group dari halaman checkout kamu */
+.form-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--dark-brown);
+    font-size: 0.95rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: inherit;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary-brown);
+    box-shadow: 0 0 0 2px rgba(166, 124, 82, 0.2);
+}
+
+/* Tombol login mengambil inspirasi dari btn-checkout milikmu */
+.btn-login {
+    width: 100%;
+    padding: 15px;
+    background-color: var(--primary-brown);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-top: 10px;
+}
+
+.btn-login:hover {
+    background-color: var(--dark-brown);
+}
+
+.icon-shop {
+    font-size: 3.5rem;
+    color: var(--primary-brown);
+    margin-bottom: 15px;
 }
 
 /* Responsive Tablet (≤ 992px) */
