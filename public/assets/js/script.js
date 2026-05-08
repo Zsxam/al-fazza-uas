@@ -1,5 +1,6 @@
 // 2. State & inisialisasi
 let cart = JSON.parse(localStorage.getItem('alfazza_cart')) || [];
+let posCart = [];
 
 document.addEventListener("DOMContentLoaded", () => {
     if(window.location.pathname.includes('/checkout')) renderCheckoutSummary();
@@ -103,6 +104,29 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
         });
+    }
+
+    // E. Render Kasir
+    const searchInput = document.getElementById('pos-search-input');
+    if (searchInput) {
+        // Logika Live Search
+        searchInput.addEventListener('input', function() {
+            let filter = this.value.toLowerCase();
+            let cards = document.querySelectorAll('.pos-card');
+            
+            cards.forEach(card => {
+                let title = card.querySelector('.pos-card-title').textContent.toLowerCase();
+                // Tampilkan jika cocok, sembunyikan jika tidak
+                if (title.includes(filter)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+        
+        // Panggil render pertama kali agar tulisan "Belum ada pesanan" muncul
+        renderPosCart();
     }
 });
 
@@ -257,4 +281,161 @@ function prosesCustomOrderWA() {
     wa += `_(Saya akan mengirimkan gambar referensi desainnya setelah pesan ini)_`;
 
     window.open(`https://wa.me/6281221315946?text=${encodeURIComponent(wa)}`);
+}
+
+// Fungsi memasukkan roti ke struk
+function addToPosCart(id, nama, harga) {
+    let item = posCart.find(i => i.id === id);
+    if (item) {
+        item.qty += 1; // Jika sudah ada, tambah jumlahnya
+    } else {
+        posCart.push({ id: id, nama: nama, harga: harga, qty: 1 }); // Jika belum ada, masukkan baru
+    }
+    renderPosCart();
+}
+
+// Fungsi tambah/kurang jumlah roti di struk
+function changePosQty(id, amount) {
+    let item = posCart.find(i => i.id == id);
+    if (item) {
+        item.qty += amount;
+        // Hapus item dari struk jika qty mencapai 0
+        if (item.qty <= 0) {
+            posCart = posCart.filter(i => i.id !== id);
+        }
+    }
+    renderPosCart();
+}
+
+// Fungsi mencetak ulang tampilan struk dan menghitung total
+function renderPosCart() {
+    const container = document.getElementById('pos-cart-items');
+    const totalEl = document.getElementById('pos-grand-total');
+    
+    // Cegah error jika fungsi ini berjalan di halaman pembeli biasa
+    if (!container || !totalEl) return;
+
+    let grandTotal = 0;
+    container.innerHTML = ''; // Kosongkan tampilan lama
+
+    if (posCart.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:#888; margin-top:50px;"><i class="fa-solid fa-basket-shopping" style="font-size:2rem; margin-bottom:10px;"></i><br>Belum ada pesanan.</p>';
+        totalEl.textContent = 'Rp 0';
+        return;
+    }
+
+    posCart.forEach(item => {
+        let subtotal = item.harga * item.qty;
+        grandTotal += subtotal;
+
+        container.innerHTML += `
+            <div class="cart-item">
+                <div class="cart-item-info">
+                    <h4>${item.nama}</h4>
+                    <div class="cart-item-price">Rp ${item.harga.toLocaleString('id-ID')}</div>
+                </div>
+                <div class="cart-item-qty">
+                    <button class="btn-qty" onclick="changePosQty(${item.id}, -1)">-</button>
+                    <span>${item.qty}</span>
+                    <button class="btn-qty" onclick="changePosQty(${item.id}, 1)">+</button>
+                </div>
+                <div style="font-weight: bold;">Rp ${subtotal.toLocaleString('id-ID')}</div>
+            </div>
+        `;
+    });
+
+    totalEl.textContent = 'Rp ' + grandTotal.toLocaleString('id-ID');
+}
+
+let posGrandTotal = 0;
+
+function openModal() {
+    if (posCart.length === 0) return alert("Keranjang kosong!");
+    
+    // Hitung total murni angka
+    posGrandTotal = posCart.reduce((sum, item) => sum + (item.harga * item.qty), 0);
+    document.getElementById('modal-total-text').textContent = 'Rp ' + posGrandTotal.toLocaleString('id-ID');
+    
+    // Reset form modal
+    document.getElementById('modal-paid').value = '';
+    document.getElementById('modal-change').value = 'Rp 0';
+    toggleCashInput();
+
+    document.getElementById('payment-modal').classList.add('active');
+}
+
+function closeModal() {
+    document.getElementById('payment-modal').classList.remove('active');
+}
+
+function toggleCashInput() {
+    const method = document.getElementById('modal-method').value;
+    const cashGroup = document.getElementById('cash-input-group');
+    
+    // Elemen tambahan untuk Non-Tunai
+    const nonCashInfo = document.getElementById('non-cash-info');
+    const qrisImg = document.getElementById('qris-image');
+    const transferInfo = document.getElementById('transfer-info');
+    const instruction = document.getElementById('payment-instruction');
+
+    if (method === 'Cash') {
+        cashGroup.style.display = 'block';
+        nonCashInfo.style.display = 'none'; // Sembunyikan info qris/transfer
+    } else {
+        cashGroup.style.display = 'none';
+        document.getElementById('modal-change').value = 'Rp 0';
+        document.getElementById('modal-paid').value = ''; 
+        
+        nonCashInfo.style.display = 'block'; // Tampilkan kotak peringatan mutasi
+
+        if (method === 'QRIS') {
+            instruction.textContent = "Silakan scan QRIS berikut:";
+            qrisImg.style.display = 'block';
+            transferInfo.style.display = 'none';
+        } else if (method === 'Transfer') {
+            instruction.textContent = "Silakan transfer ke rekening berikut:";
+            qrisImg.style.display = 'none';
+            transferInfo.style.display = 'block';
+        }
+    }
+}
+
+
+function calculateChange() {
+    const paid = parseInt(document.getElementById('modal-paid').value) || 0;
+    const change = paid - posGrandTotal;
+    
+    if (change >= 0) {
+        document.getElementById('modal-change').value = 'Rp ' + change.toLocaleString('id-ID');
+        document.getElementById('modal-change').style.color = '#388e3c'; // Hijau kalau cukup
+    } else {
+        document.getElementById('modal-change').value = 'Uang Kurang!';
+        document.getElementById('modal-change').style.color = '#d32f2f'; // Merah kalau kurang
+    }
+}
+
+function submitFinalPayment() {
+    const method = document.getElementById('modal-method').value;
+    let paid = parseInt(document.getElementById('modal-paid').value) || 0;
+    
+    // Kalau bayar cash, uang tidak boleh kurang
+    if (method === 'Cash' && paid < posGrandTotal) {
+        return alert("Nominal uang yang dibayarkan kurang dari total tagihan!");
+    }
+
+    // Kalau bukan cash, anggap uang pas
+    if (method !== 'Cash') {
+        paid = posGrandTotal; 
+    }
+
+    let change = paid - posGrandTotal;
+
+    // Masukkan data ke form tersembunyi
+    document.getElementById('cart-data-input').value = JSON.stringify(posCart);
+    document.getElementById('input-method').value = method;
+    document.getElementById('input-paid').value = paid;
+    document.getElementById('input-change').value = change;
+
+    // Submit form
+    document.getElementById('form-pos').submit();
 }

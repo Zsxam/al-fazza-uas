@@ -9,6 +9,10 @@ class Product extends Model
 {
     use HasFactory;
 
-    // Mengizinkan semua kolom diisi secara massal, KECUALI kolom 'id'
     protected $guarded = ['id'];
+
+    public function details()
+    {
+        return $this->hasMany(TransactionDetail::class);
+    }
 }

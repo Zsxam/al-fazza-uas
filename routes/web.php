@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\KasirController;
 
 // 1. Rute Dinamis (Mengambil data roti dari Database menggunakan Controller)
 // - Rute untuk halaman utama (Bisa diakses semua orang)
@@ -44,12 +45,13 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 // 3. Rute Khusus Kasir
 Route::middleware(['auth', 'role:kasir'])->group(function () {
-    Route::get('/kasir/dashboard', function () {
-        return "<h1>Ini Halaman Kasir POS</h1> <form action='".route('logout')."' method='POST'>".csrf_field()."<button type='submit'>Logout</button></form>";
-    })->name('kasir.dashboard');
+    Route::get('/kasir/pos', [KasirController::class, 'index'])->name('kasir.pos');
     
-    // Nanti rute proses transaksi offline, cetak struk, dll taruh di sini
+    Route::post('/kasir/proses', [KasirController::class, 'prosesPos'])->name('kasir.proses');
+
+    Route::get('/kasir/selesai/{id}', [KasirController::class, 'selesai'])->name('kasir.selesai');
 });
+
 
 // 2. Rute Statis (Hanya menampilkan view dasar, belum butuh data dari database)
 Route::get('/about', function () {
