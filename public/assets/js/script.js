@@ -220,7 +220,7 @@ function prosesCheckoutWA() {
         wa += `- ${i.quantity}x ${i.name} (Rp ${sub.toLocaleString('id-ID')})\n`;
     });
     
-    window.open(`https://wa.me/6281221315946?text=${encodeURIComponent(wa + `\n*Total: Rp ${total.toLocaleString('id-ID')}*`)}`);
+    window.open(`https://wa.me/6281221315946?t  ext=${encodeURIComponent(wa + `\n*Total: Rp ${total.toLocaleString('id-ID')}*`)}`);
 }
 
 // 6. Fungsi Custom Order
@@ -438,4 +438,86 @@ function submitFinalPayment() {
 
     // Submit form
     document.getElementById('form-pos').submit();
+}
+
+// ==========================================
+// 7. FUNGSI PEMBAYARAN ONLINE (MIDTRANS)
+// ==========================================
+function payNow() {
+    // 1. Cek apakah keranjang kosong menggunakan variabel global 'cart'
+    if (cart.length === 0) {
+        return alert('Keranjang belanja kosong!');
+    }
+
+    // 2. Hitung total harga (perhatikan nama propertinya: price & quantity)
+    let grandTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    // 3. Ambil data formulir pembeli
+    let namaPembeli = document.getElementById('nama')?.value;
+    let noHp = document.getElementById('nohp')?.value;
+    let alamat = document.getElementById('alamat')?.value;
+
+    if (!namaPembeli || !noHp || !alamat) {
+        return alert('Mohon lengkapi Nama, No HP, dan Alamat Pengiriman!');
+    }
+
+    // 4. Ambil CSRF Token dari tag <meta> di layout utama
+    let csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (!csrfToken) {
+        return alert("Error: Meta CSRF Token tidak ditemukan di layout!");
+    }
+
+    // 5. Kirim data ke Laravel Controller
+    fetch("/checkout/process", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": csrfToken.getAttribute('content')
+        },
+        body: JSON.stringify({
+            total_price: grandTotal, 
+            items: cart,
+            customer_name: namaPembeli,
+            customer_phone: noHp,
+            delivery_address: alamat
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.snap_token) {
+            // Munculkan Pop-up Midtrans DULU (Jangan hapus keranjang di sini)
+            window.snap.pay(data.snap_token, {
+                onSuccess: function(result) {
+                    // HAPUS KERANJANG DI SINI (Karena sudah lunas)
+                    localStorage.removeItem('alfazza_cart'); 
+                    cart = []; 
+                    updateCartUI(); 
+
+                    alert("Pembayaran Berhasil!");
+                    window.location.href = "/"; // Nanti bisa diarahkan ke halaman history
+                },
+                onPending: function(result) {
+                    // HAPUS KERANJANG DI SINI (Karena invoice sudah terbuat, tinggal nunggu transfer)
+                    localStorage.removeItem('alfazza_cart'); 
+                    cart = []; 
+                    updateCartUI();
+
+                    alert("Menunggu pembayaran diselesaikan...");
+                    window.location.href = "/"; 
+                },
+                onError: function(result) {
+                    alert("Pembayaran gagal diproses!");
+                },
+                onClose: function() {
+                    alert('Kamu menutup halaman pembayaran sebelum menyelesaikan transaksi.'); 
+                }
+            });
+        } else {
+            alert("Gagal mendapatkan token: " + (data.error || "Unknown Error"));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert("Terjadi kesalahan sistem saat memproses pembayaran.");
+    });
 }

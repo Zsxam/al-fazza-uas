@@ -62,10 +62,13 @@
                 <textarea id="catatan" rows="3" placeholder="Tulis catatan pesanan di sini (Opsional)"></textarea>
             </div>
 
-            <button class="btn-bayar-wa" onclick="prosesCheckoutWA()">LANJUT KE WHATSAPP</button>
+            <button type="button" class="btn-bayar-wa" onclick="payNow()" style="background-color: #1a365d;">
+                <i class="fa-solid fa-credit-card"></i> BAYAR SEKARANG
+            </button>
         </div>
     </div>
 
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
     <script>
         document.addEventListener("DOMContentLoaded", renderCheckoutSummary);
     </script>

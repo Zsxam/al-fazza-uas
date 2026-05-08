@@ -5,6 +5,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\KasirController;
+use App\Http\Controllers\TransactionController;
 
 // 1. Rute Dinamis (Mengambil data roti dari Database menggunakan Controller)
 // - Rute untuk halaman utama (Bisa diakses semua orang)
@@ -61,6 +62,10 @@ Route::get('/about', function () {
 Route::get('/checkout', function () {
     return view('checkout');
 });
+Route::post('/checkout/process', [TransactionController::class, 'processCheckout'])->name('checkout.process'); 
+Route::post('/midtrans/callback', [TransactionController::class, 'callback']);
+// Route::middleware(['auth'])->group(function () {
+// });
 
 Route::get('/custom-order', function () {
     return view('custom-order');
