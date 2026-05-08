@@ -61,6 +61,49 @@ document.addEventListener("DOMContentLoaded", () => {
     mainNav?.querySelectorAll('.nav-links li:not(.dropdown) a, .dropdown-menu a, #cart-btn').forEach(link => {
         link.addEventListener('click', closeNav);
     });
+
+    // D. Chart Pendapatan di Dashboard Admin
+    const canvasChart = document.getElementById('revenueChart');
+    
+    if (canvasChart) {
+        const ctx = canvasChart.getContext('2d');
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                // Mengambil data jembatan dari window (Blade)
+                labels: window.chartLabels, 
+                datasets: [{
+                    label: 'Pendapatan (Rp)',
+                    data: window.chartData, 
+                    borderColor: '#a67c52',
+                    backgroundColor: 'rgba(166, 124, 82, 0.2)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#4a3b32',
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'Rp ' + value.toLocaleString('id-ID');
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
 });
 
 // 3. Fungsi Keranjang Utama

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AdminController;
 
 // 1. Rute Dinamis (Mengambil data roti dari Database menggunakan Controller)
 // - Rute untuk halaman utama (Bisa diakses semua orang)
@@ -24,11 +25,21 @@ Route::middleware('auth')->group(function () {
 
 // 2. Rute Khusus Admin
 Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/admin/dashboard', function () {
-        return "<h1>Ini Halaman Admin</h1> <form action='".route('logout')."' method='POST'>".csrf_field()."<button type='submit'>Logout</button></form>";
-    })->name('admin.dashboard');
+    // Rute halaman utama dashboard admin
+    Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     
-    // Nanti rute tambah produk, edit produk, dll taruh di sini
+    // Rute untuk mengelola produk
+    Route::get('/admin/produk', [AdminController::class, 'produkIndex'])->name('admin.produk.index'); // Tampil Tabel
+    Route::get('/admin/produk/tambah', [AdminController::class, 'produkCreate'])->name('admin.produk.create'); // Form Tambah
+    Route::post('/admin/produk', [AdminController::class, 'produkStore'])->name('admin.produk.store'); // Proses Simpan
+    Route::get('/admin/produk/{id}/edit', [AdminController::class, 'produkEdit'])->name('admin.produk.edit'); // Form Edit
+    Route::put('/admin/produk/{id}', [AdminController::class, 'produkUpdate'])->name('admin.produk.update'); // Proses Update
+    Route::delete('/admin/produk/{id}', [AdminController::class, 'produkDestroy'])->name('admin.produk.destroy'); // Proses Hapus
+
+    // Rute untuk mengelola stok (Riwayat Stok & Catat Stok)
+    Route::get('/admin/stok', [AdminController::class, 'stokIndex'])->name('admin.stok.index'); // Tampil Riwayat
+    Route::get('/admin/stok/tambah', [AdminController::class, 'stokCreate'])->name('admin.stok.create'); // Form Catat Stok
+    Route::post('/admin/stok', [AdminController::class, 'stokStore'])->name('admin.stok.store'); // Proses Simpan & Update Stok
 });
 
 // 3. Rute Khusus Kasir
