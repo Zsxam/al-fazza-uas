@@ -137,7 +137,7 @@
 
             <div id="cash-input-group" style="margin-bottom: 15px;">
                 <label style="display: block; font-weight: bold; margin-bottom: 5px;">Uang Diterima (Rp)</label>
-                <input type="number" id="modal-paid" class="pos-search" style="margin-bottom: 0;" placeholder="Contoh: 50000" onkeyup="calculateChange()">
+                <input type="number" id="modal-paid" class="pos-search" style="margin-bottom: 0;" placeholder="Contoh: 50000" onkeyup="calculateChange()" min="0" oninput="this.value = Math.abs(this.value)">
             </div>
 
             <div id="non-cash-info" style="display: none; text-align: center; margin-bottom: 15px; background: #fdfaf6; padding: 15px; border-radius: 8px; border: 1px dashed #a67c52;">
