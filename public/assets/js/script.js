@@ -3,6 +3,18 @@ let cart = JSON.parse(localStorage.getItem('alfazza_cart')) || [];
 let posCart = [];
 
 document.addEventListener("DOMContentLoaded", () => {
+    // === TAMBAHAN KUNCI TANGGAL ===
+    // Sesuaikan ID-nya. Kalau untuk Custom Order: 'co_tanggal'. 
+    // Kalau untuk Checkout biasa, ganti dengan ID input tanggalmu.
+    const inputTanggal = document.getElementById('co_tanggal'); 
+    
+    if (inputTanggal) {
+        // Ambil tanggal hari ini dengan format YYYY-MM-DD (Standar HTML)
+        const today = new Date().toISOString().split('T')[0];
+        // Set batas minimal kalender ke hari ini
+        inputTanggal.setAttribute('min', today);
+    }
+    // =============================
     if(window.location.pathname.includes('/checkout')) renderCheckoutSummary();
     updateCartUI(); 
 
@@ -295,14 +307,44 @@ function prosesCustomOrderMidtrans() {
     const alamat = document.getElementById('co_alamat').value || "-";
     const catatan = document.getElementById('co_catatan').value || "-";
 
-    // 2. Validasi
-    if (!nama || !nohp || !tema || !tanggal) {
-        return alert("Mohon lengkapi Nama, No HP, Tema/Warna, dan Tanggal Diperlukan!");
-    }
-    if (metode === "Dikirim" && !alamat) {
-        return alert("Mohon isi alamat pengiriman!");
+    // 2. Validasi (PALANG PINTU)
+    if (!tanggal || tanggal.trim() === "") {
+        alert("⚠️ Mohon isi Tanggal Pengiriman terlebih dahulu!");
+        document.getElementById('co_tanggal').focus();
+        return; // Menghentikan script ke Midtrans
     }
 
+    if (!nama || nama.trim() === "") {
+        alert("⚠️ Mohon lengkapi Nama Anda!");
+        document.getElementById('co_nama').focus();
+        return; 
+    }
+
+    if (!nohp || nohp.trim() === "") {
+        alert("⚠️ Mohon isi No WhatsApp!");
+        document.getElementById('co_nohp').focus();
+        return; 
+    }
+
+    if (!tema || tema.trim() === "") {
+        alert("⚠️ Mohon isi Tema/Warna kue!");
+        document.getElementById('co_tema').focus();
+        return; 
+    }
+
+    if (metode === "Dikirim" && (!alamat || alamat.trim() === "")) {
+        alert("⚠️ Mohon isi detail alamat pengiriman!");
+        document.getElementById('co_alamat').focus();
+        return; 
+    }
+
+    // === TAMBAHAN GERBANG KONFIRMASI ===
+    const konfirmasi = confirm("Mohon periksa kembali:\nApakah spesifikasi kue, alamat pengiriman, dan data diri Anda sudah sesuai?\n\nKlik 'OK' untuk memproses tagihan.");
+    
+    // Jika pembeli klik "Cancel/Batal", hentikan proses!
+    if (!konfirmasi) {
+        return; 
+    }
     // 3. Tentukan Harga (Karena Midtrans WAJIB ada angka tagihan)
     // Kamu bisa ganti angka ini, atau ambil dari inputan harga jika ada
     let hargaCustomCake = 150000; 
@@ -543,8 +585,46 @@ function payNow() {
     let noHp = document.getElementById('nohp')?.value;
     let alamat = document.getElementById('alamat')?.value;
 
-    if (!namaPembeli || !emailPembeli || !noHp || !alamat) {
-        return alert('Mohon lengkapi Nama, Email, No HP, dan Alamat Pengiriman!');
+// (Lanjutan dari fungsi payNow, di bawah pengambilan data)
+
+    // PALANG PINTU VALIDASI CHECKOUT BIASA
+    if (!namaPembeli || namaPembeli.trim() === "") {
+        alert('⚠️ Mohon isi Nama Anda!');
+        document.getElementById('nama').focus();
+        return; // Menghentikan script
+    }
+
+    if (!emailPembeli || emailPembeli.trim() === "") {
+        alert('⚠️ Mohon isi Email Anda!');
+        document.getElementById('email').focus();
+        return;
+    }
+
+    if (!noHp || noHp.trim() === "") {
+        alert('⚠️ Mohon isi No HP Anda!');
+        document.getElementById('nohp').focus();
+        return;
+    }
+
+    if (!alamat || alamat.trim() === "") {
+        alert('⚠️ Mohon isi Alamat Pengiriman!');
+        document.getElementById('alamat').focus();
+        return;
+    }
+
+    // CATATAN: Kalau di form checkout biasa ini kamu JUGA punya input tanggal pengiriman (misal id-nya 'tanggal_kirim'), tambahkan juga seperti ini:
+    let tanggalKirim = document.getElementById('tanggal_kirim')?.value;
+    if (!tanggalKirim || tanggalKirim.trim() === "") {
+         alert('⚠️ Mohon isi Tanggal Pengiriman!');
+         document.getElementById('tanggal_kirim').focus();
+         return;
+    }
+
+    // === TAMBAHAN GERBANG KONFIRMASI ===
+    const konfirmasiCheckout = confirm("Mohon periksa kembali:\nApakah daftar belanjaan dan alamat pengiriman Anda sudah sesuai?\n\nKlik 'OK' untuk melanjutkan ke pembayaran.");
+    
+    if (!konfirmasiCheckout) {
+        return; // Hentikan script jika klik Cancel
     }
 
     // 4. Ambil CSRF Token dari tag <meta> di layout utama

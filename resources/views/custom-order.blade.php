@@ -74,8 +74,8 @@
                     <input type="text" id="co_tema" required placeholder="Contoh: Tema Spiderman, dominan merah dan biru">
                 </div>
                 <div class="form-group">
-                    <label>Tulisan di Atas Kue</label>
-                    <input type="text" id="co_tulisan" placeholder="Contoh: Happy Birthday Mama ke-50">
+                    <label>Tulisan di Atas Kue *</label>
+                    <input type="text" id="co_tulisan" required placeholder="Contoh: Happy Birthday Mama ke-50">
                 </div>
 
                 <h2>Waktu & Pengiriman</h2>
@@ -96,11 +96,6 @@
                     <label>Alamat Pengiriman</label>
                     <textarea id="co_alamat" rows="3" placeholder="Isi detail alamat pengiriman jika memilih 'Dikirim'"></textarea>
                 </div>
-
-                <div class="payment-info">
-                    <i class="fa-solid fa-camera"></i>
-                    <p>Setelah menekan tombol kirim ke WA, mohon lampirkan gambar referensi kue Anda di ruang chat.</p>
-                </div>
             </form>
         </div>
 
@@ -115,7 +110,7 @@
                         <li>Isi formulir spesifikasi <em>Custom Cake</em> Anda dengan lengkap dan teliti.</li>
                         <li><strong>Total harga</strong> akan otomatis terhitung berdasarkan <strong>Ukuran Kue</strong> yang Anda pilih.</li>
                         <li>Klik tombol <strong>"PESAN & BAYAR SEKARANG"</strong> untuk menyelesaikan pembayaran pesanan Anda.</li>
-                        <li>Setelah pembayaran berhasil, segera <strong>kirimkan foto referensi atau contoh desain kue</strong> Anda ke WhatsApp admin kami <strong>08952338283</strong> dengan melampirkan Nomor Invoice.</li>
+                        <li>Setelah pembayaran berhasil, <strong>Anda bisa mengirimkan foto referensi atau contoh desain kue</strong> Anda ke WhatsApp admin kami <strong>08952338283</strong> dengan melampirkan Nomor Invoice.</li>
                     </ol>
                 </div>
             </div>
