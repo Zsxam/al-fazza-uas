@@ -285,7 +285,7 @@ function prosesCustomOrderWA() {
 
 // Fungsi memasukkan roti ke struk
 function addToPosCart(id, nama, harga) {
-    let item = posCart.find(i => i.id === id);
+    let item = posCart.find(i => i.id == id);
     if (item) {
         item.qty += 1; // Jika sudah ada, tambah jumlahnya
     } else {
@@ -301,7 +301,7 @@ function changePosQty(id, amount) {
         item.qty += amount;
         // Hapus item dari struk jika qty mencapai 0
         if (item.qty <= 0) {
-            posCart = posCart.filter(i => i.id !== id);
+            posCart = posCart.filter(i => i.id != id);
         }
     }
     renderPosCart();
