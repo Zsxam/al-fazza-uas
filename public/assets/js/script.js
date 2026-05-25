@@ -294,30 +294,44 @@ function prosesCustomOrderMidtrans() {
     const nama = document.getElementById('co_nama').value;
     const nohp = document.getElementById('co_nohp').value;
     // Anggap kita tambahkan input email, kalau kosong pakai dummy sementara
-    const email = document.getElementById('co_email')?.value || 'custom@alfazza.com'; 
+    const email = document.getElementById('co_email')?.value; 
     
     const ukuran = document.getElementById('co_ukuran').value;
     const bentuk = document.getElementById('co_bentuk').value;
     const rasa = document.getElementById('co_rasa').value;
     const isian = document.getElementById('co_isian').value;
     const tema = document.getElementById('co_tema').value;
-    const tulisan = document.getElementById('co_tulisan').value || "-";
+    const tulisan = document.getElementById('co_tulisan').value;
     const tanggal = document.getElementById('co_tanggal').value;
     const metode = document.getElementById('co_metode').value;
-    const alamat = document.getElementById('co_alamat').value || "-";
+    const alamat = document.getElementById('co_alamat').value;
     const catatan = document.getElementById('co_catatan').value || "-";
 
     // 2. Validasi (PALANG PINTU)
-    if (!tanggal || tanggal.trim() === "") {
-        alert("⚠️ Mohon isi Tanggal Pengiriman terlebih dahulu!");
-        document.getElementById('co_tanggal').focus();
-        return; // Menghentikan script ke Midtrans
-    }
-
     if (!nama || nama.trim() === "") {
         alert("⚠️ Mohon lengkapi Nama Anda!");
         document.getElementById('co_nama').focus();
         return; 
+    }
+
+    const regexHurufCustom = /^[A-Za-z\s]+$/;
+    if (!regexHurufCustom.test(nama)) {
+        alert("⚠️ Nama hanya boleh berisi huruf dan spasi (tanpa angka/simbol)!");
+        document.getElementById('co_nama').focus();
+        return;
+    }
+
+    if (!email || email.trim() === "") {
+        alert('⚠️ Mohon isi Email Anda!');
+        document.getElementById('co_email').focus();
+        return;
+    }
+
+    const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!regexEmail.test(email)) {
+        alert('⚠️ Format Email tidak valid! (Contoh: nama@email.com)');
+        document.getElementById('co_email').focus();
+        return;
     }
 
     if (!nohp || nohp.trim() === "") {
@@ -326,9 +340,52 @@ function prosesCustomOrderMidtrans() {
         return; 
     }
 
+    // === DETEKTOR SPESIFIKASI KUE (Wajib Pilih) ===
+    if (!ukuran || ukuran === "") {
+        alert("⚠️ Mohon pilih Ukuran Kue terlebih dahulu!");
+        document.getElementById('co_ukuran').focus();
+        return; 
+    }
+    
+    if (!bentuk || bentuk === "") {
+        alert("⚠️ Mohon pilih Bentuk Kue!");
+        document.getElementById('co_bentuk').focus();
+        return; 
+    }
+
+    if (!rasa || rasa === "") {
+        alert("⚠️ Mohon pilih Base Cake (Rasa)!");
+        document.getElementById('co_rasa').focus();
+        return; 
+    }
+
+    if (!isian || isian === "") {
+        alert("⚠️ Mohon pilih Filling / Isian!");
+        document.getElementById('co_isian').focus();
+        return; 
+    }
+
     if (!tema || tema.trim() === "") {
         alert("⚠️ Mohon isi Tema/Warna kue!");
         document.getElementById('co_tema').focus();
+        return; 
+    }
+
+    if (!tulisan || tulisan.trim() === "") {
+        alert("⚠️ Mohon isi Tulisan di atas kue");
+        document.getElementById('co_tulisan').focus();
+        return; 
+    }
+
+    if (!tanggal || tanggal.trim() === "") {
+        alert("⚠️ Mohon isi Tanggal Pengiriman terlebih dahulu!");
+        document.getElementById('co_tanggal').focus();
+        return; // Menghentikan script ke Midtrans
+    }
+
+    if (!metode || metode.trim() === "") {
+        alert("⚠️ Mohon isi Metode pengiriman anda");
+        document.getElementById('co_metode').focus();
         return; 
     }
 
@@ -594,8 +651,22 @@ function payNow() {
         return; // Menghentikan script
     }
 
+    const regexHuruf = /^[A-Za-z\s]+$/;
+    if (!regexHuruf.test(namaPembeli)) {
+        alert('⚠️ Nama hanya boleh berisi huruf dan spasi (tanpa angka/simbol)!');
+        document.getElementById('nama').focus();
+        return;
+    }
+
     if (!emailPembeli || emailPembeli.trim() === "") {
         alert('⚠️ Mohon isi Email Anda!');
+        document.getElementById('email').focus();
+        return;
+    }
+
+    const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!regexEmail.test(emailPembeli)) {
+        alert('⚠️ Format Email tidak valid! (Contoh: nama@email.com)');
         document.getElementById('email').focus();
         return;
     }
@@ -606,18 +677,18 @@ function payNow() {
         return;
     }
 
-    if (!alamat || alamat.trim() === "") {
-        alert('⚠️ Mohon isi Alamat Pengiriman!');
-        document.getElementById('alamat').focus();
-        return;
-    }
-
     // CATATAN: Kalau di form checkout biasa ini kamu JUGA punya input tanggal pengiriman (misal id-nya 'tanggal_kirim'), tambahkan juga seperti ini:
     let tanggalKirim = document.getElementById('tanggal_kirim')?.value;
     if (!tanggalKirim || tanggalKirim.trim() === "") {
          alert('⚠️ Mohon isi Tanggal Pengiriman!');
          document.getElementById('tanggal_kirim').focus();
          return;
+    }
+
+    if (!alamat || alamat.trim() === "") {
+        alert('⚠️ Mohon isi Alamat Pengiriman!');
+        document.getElementById('alamat').focus();
+        return;
     }
 
     // === TAMBAHAN GERBANG KONFIRMASI ===
