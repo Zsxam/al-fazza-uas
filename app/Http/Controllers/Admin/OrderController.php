@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Transaction;
+use App\Http\Requests\UpdateOrderStatusRequest;
 
 class OrderController extends Controller
 {
@@ -26,12 +27,8 @@ class OrderController extends Controller
         return view('admin.pesanan.index', compact('pesanan'));
     }
 
-    public function pesananUpdateStatus(Request $request, $id)
+    public function pesananUpdateStatus(UpdateOrderStatusRequest $request, $id)
     {
-        $request->validate([
-            'order_status' => 'required|in:baru,diproses,dikirim,selesai'
-        ]);
-
         Transaction::findOrFail($id)->update([
             'order_status' => $request->order_status
         ]);

@@ -19,7 +19,7 @@
                     
                     <div class="form-group" style="flex: 1; min-width: 200px;">
                         <label style="font-weight: bold; margin-bottom: 5px; display: block;">No. WhatsApp *</label>
-                        <input type="number" id="nohp" required placeholder="Contoh: 081234567890" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+                        <input type="tel" id="nohp" required placeholder="Contoh: 081234567890" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
                     </div>
                 </div>
 

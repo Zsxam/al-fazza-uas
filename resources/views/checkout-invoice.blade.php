@@ -43,6 +43,11 @@
                 <span style="color: #888;">Jenis Pesanan</span>
                 <span style="background: #9b59b6; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">Custom Cake</span>
             </div>
+            @elseif($transaksi->order_type == 'online')
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #ddd; padding-bottom: 8px; margin-bottom: 8px;">
+                <span style="color: #888;">Jenis Pesanan</span>
+                <span style="background: #3498db; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">Web (Online)</span>
+            </div>
             @endif
             <div style="display: flex; justify-content: space-between; margin-top: 15px; font-size: 1.1rem;">
                 <strong>Total Bayar</strong>

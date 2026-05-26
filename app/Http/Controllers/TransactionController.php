@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Transaction;
 use App\Services\CheckoutService;
+use App\Http\Requests\ProcessCheckoutRequest;
+use App\Http\Requests\CustomCheckoutRequest;
 use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
@@ -16,20 +18,22 @@ class TransactionController extends Controller
         $this->checkoutService = $checkoutService;
     }
 
-    public function processCheckout(Request $request)
+    public function processCheckout(ProcessCheckoutRequest $request)
     {
+        $data = $request->validated();
+        
         $customerData = [
             'user_id' => Auth::id() ?? null,
-            'customer_name' => $request->customer_name,
-            'customer_email' => $request->customer_email,
-            'customer_phone' => $request->customer_phone,
-            'delivery_date' => $request->delivery_date,
-            'delivery_address' => $request->delivery_address,
-            'notes' => $request->notes,
+            'customer_name' => $data['customer_name'],
+            'customer_email' => $data['customer_email'],
+            'customer_phone' => $data['customer_phone'],
+            'delivery_date' => $data['delivery_date'],
+            'delivery_address' => $data['delivery_address'],
+            'notes' => $data['notes'] ?? null,
         ];
 
         $result = $this->checkoutService->processCheckout(
-            $request->items,
+            $data['items'],
             $customerData,
             'online',
             'Midtrans (Pending)',
@@ -85,71 +89,25 @@ class TransactionController extends Controller
         return view('checkout-invoice', compact('transaksi', 'ui'));
     }
 
-    public function processCustomCheckout(Request $request)
+    public function processCustomCheckout(CustomCheckoutRequest $request)
     {
-        $request->validate([
-            'customer_name' => 'required|string|max:255',
-            'customer_email' => 'required|email|max:255',
-            'customer_phone' => 'required|string|max:20',
-            'delivery_date' => 'required|date',
-            'delivery_address' => 'required|string',
-            'custom_details' => 'required|string',
-        ]);
-
-        $invoice = 'CST-' . date('YmdHis');
-        $totalAmount = $request->total_price ?? 150000;
+        $data = $request->validated();
         
-        $transaction = Transaction::create([
-            'invoice_number' => $invoice,
-            'user_id' => Auth::id() ?? null,
-            'customer_name' => $request->customer_name,
-            'customer_email' => $request->customer_email,
-            'customer_phone' => $request->customer_phone,
-            'delivery_date' => $request->delivery_date,
-            'delivery_address' => $request->delivery_address,
-            'notes' => $request->custom_details . "\nCatatan Tambahan: " . ($request->notes ?? '-'),
-            'order_type' => 'custom-order',
-            'total_amount' => $totalAmount, 
-            'payment_status' => 'pending',
-            'payment_method' => 'Midtrans (Pending)',
-        ]);
+        $invoice = 'CST-' . date('YmdHis');
+        $totalAmount = $data['total_price'] ?? 150000;
+        
+        $data['user_id'] = Auth::id() ?? null;
 
-        // Konfigurasi Midtrans
-        \Midtrans\Config::$serverKey = config('midtrans.server_key');
-        \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
-        \Midtrans\Config::$isSanitized = true;
-        \Midtrans\Config::$is3ds = true;
-        \Midtrans\Config::$curlOptions = [
-            CURLOPT_SSL_VERIFYHOST => 0,
-            CURLOPT_SSL_VERIFYPEER => 0,
-            CURLOPT_HTTPHEADER => [], // Fix bug SDK Midtrans (Undefined array key 10023)
-        ];
+        $result = $this->checkoutService->processCustomOrder($data, $invoice, $totalAmount);
 
-        $params = [
-            'transaction_details' => [
-                'order_id' => $invoice,
-                'gross_amount' => (int) $totalAmount,
-            ],
-            'customer_details' => [
-                'first_name' => $request->customer_name,
-                'email' => $request->customer_email,
-                'phone' => $request->customer_phone,
-            ],
-        ];
-
-        try {
-            $snapToken = \Midtrans\Snap::getSnapToken($params);
-            $transaction->update(['snap_token' => $snapToken]);
-
-            return response()->json([
-                'success' => true,
-                'snap_token' => $snapToken,
-                'invoice' => $invoice
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => $e->getMessage()
-            ], 500);
+        if (!$result['success']) {
+            return response()->json(['error' => $result['message']], 500);
         }
+
+        return response()->json([
+            'success' => true,
+            'snap_token' => $result['snap_token'],
+            'invoice' => $result['invoice']
+        ]);
     }
 }

@@ -9,6 +9,7 @@ use App\Models\InventoryLog;
 use Illuminate\Support\Facades\DB;
 use Midtrans\Config;
 use Midtrans\Snap;
+use Illuminate\Support\Facades\Mail;
 use Exception;
 
 class CheckoutService
@@ -31,7 +32,8 @@ class CheckoutService
                     throw new Exception('Format keranjang sudah usang. Mohon kosongkan keranjang Anda dan tambahkan ulang produk.');
                 }
 
-                $product = Product::find($item['id']);
+                // Pessimistic Locking untuk mencegah race condition (2 orang beli barang sisa 1 di saat bersamaan)
+                $product = Product::where('id', $item['id'])->lockForUpdate()->first();
                 
                 if (!$product) {
                     throw new Exception('Produk tidak ditemukan!');
@@ -118,6 +120,19 @@ class CheckoutService
 
                 $snapToken = Snap::getSnapToken($params);
                 $transaction->update(['snap_token' => $snapToken]);
+
+                // Kirim email pending
+                if (!empty($customerData['customer_email'])) {
+                    try {
+                        $linkInvoice = config('app.url') . '/checkout/invoice/' . $transaction->invoice_number;
+                        Mail::send('emails.invoice', ['transaction' => $transaction, 'linkInvoice' => $linkInvoice], function ($message) use ($transaction) {
+                            $message->to($transaction->customer_email, $transaction->customer_name)
+                                    ->subject('Tagihan Pesanan ' . $transaction->invoice_number);
+                        });
+                    } catch (Exception $e) {
+                        \Illuminate\Support\Facades\Log::error('Email pending failed: ' . $e->getMessage());
+                    }
+                }
             }
 
             DB::commit();
@@ -133,8 +148,166 @@ class CheckoutService
             DB::rollBack();
             return [
                 'success' => false,
-                'message' => $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine()
+                'message' => $e->getMessage()
             ];
+        }
+    }
+
+    public function processCustomOrder($data, $invoice, $totalAmount)
+    {
+        DB::beginTransaction();
+        try {
+            $transaction = Transaction::create([
+                'invoice_number' => $invoice,
+                'user_id' => $data['user_id'] ?? null,
+                'customer_name' => $data['customer_name'],
+                'customer_email' => $data['customer_email'],
+                'customer_phone' => $data['customer_phone'],
+                'delivery_date' => $data['delivery_date'],
+                'delivery_address' => $data['delivery_address'],
+                'custom_details' => $data['custom_details'],
+                'notes' => ($data['notes'] ?? '-'),
+                'order_type' => 'custom-order',
+                'total_amount' => $totalAmount, 
+                'payment_status' => 'pending',
+                'payment_method' => 'Midtrans (Pending)',
+            ]);
+
+            // Konfigurasi Midtrans
+            Config::$serverKey = config('midtrans.server_key');
+            Config::$isProduction = config('midtrans.is_production', false);
+            Config::$isSanitized = true;
+            Config::$is3ds = true;
+            Config::$curlOptions = [
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_SSL_VERIFYPEER => 0,
+                CURLOPT_HTTPHEADER => [],
+            ];
+
+            $params = [
+                'transaction_details' => [
+                    'order_id' => $invoice,
+                    'gross_amount' => (int) $totalAmount,
+                ],
+                'customer_details' => [
+                    'first_name' => $data['customer_name'],
+                    'email' => $data['customer_email'],
+                    'phone' => $data['customer_phone'],
+                ],
+            ];
+
+            $snapToken = Snap::getSnapToken($params);
+            $transaction->update(['snap_token' => $snapToken]);
+
+            // Kirim email pending
+            if (!empty($data['customer_email'])) {
+                try {
+                    $linkInvoice = config('app.url') . '/checkout/invoice/' . $transaction->invoice_number;
+                    Mail::send('emails.invoice', ['transaction' => $transaction, 'linkInvoice' => $linkInvoice], function ($message) use ($transaction) {
+                        $message->to($transaction->customer_email, $transaction->customer_name)
+                                ->subject('Tagihan Pesanan ' . $transaction->invoice_number);
+                    });
+                } catch (Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('Email pending failed: ' . $e->getMessage());
+                }
+            }
+
+            DB::commit();
+
+            return [
+                'success' => true,
+                'snap_token' => $snapToken,
+                'invoice' => $invoice
+            ];
+        } catch (Exception $e) {
+            DB::rollBack();
+            return [
+                'success' => false,
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    public function handleMidtransCallback($notification)
+    {
+        DB::beginTransaction();
+        try {
+            Config::$serverKey = config('midtrans.server_key');
+            Config::$isProduction = config('midtrans.is_production', false);
+            Config::$isSanitized = true;
+            Config::$is3ds = true;
+            Config::$curlOptions = [
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_SSL_VERIFYPEER => 0,
+                CURLOPT_HTTPHEADER => [],
+            ];
+
+            $notif = new \Midtrans\Notification();
+
+            $transaction = $notif->transaction_status;
+            $type = $notif->payment_type;
+            $order_id = $notif->order_id;
+            $fraud = $notif->fraud_status;
+
+            $transaksi = Transaction::where('invoice_number', $order_id)->first();
+            
+            if (!$transaksi) {
+                throw new Exception('Transaksi tidak ditemukan.');
+            }
+
+            if ($transaction == 'capture') {
+                if ($type == 'credit_card') {
+                    if ($fraud == 'challenge') {
+                        $transaksi->update(['payment_status' => 'pending']);
+                    } else {
+                        $transaksi->update(['payment_status' => 'success', 'payment_method' => $type, 'amount_paid' => $notif->gross_amount]);
+                    }
+                }
+            } else if ($transaction == 'settlement') {
+                $transaksi->update(['payment_status' => 'success', 'payment_method' => $type, 'amount_paid' => $notif->gross_amount]);
+            } else if ($transaction == 'pending') {
+                $transaksi->update(['payment_status' => 'pending']);
+            } else if ($transaction == 'deny' || $transaction == 'expire' || $transaction == 'cancel') {
+                $transaksi->update(['payment_status' => 'failed']);
+                
+                if ($transaksi->order_type == 'online') {
+                    // Kembalikan stok
+                    $details = TransactionDetail::where('transaction_id', $transaksi->id)->get();
+                    foreach ($details as $detail) {
+                        $product = Product::find($detail->product_id);
+                        if ($product) {
+                            $product->increment('stok', $detail->qty);
+                            
+                            InventoryLog::create([
+                                'product_id' => $product->id,
+                                'tipe' => 'masuk',
+                                'jumlah' => $detail->qty,
+                                'keterangan' => 'Pembatalan Transaksi (' . $order_id . ')',
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            if ($transaksi->customer_email && in_array($transaksi->payment_status, ['success', 'failed'])) {
+                try {
+                    $linkInvoice = config('app.url') . '/checkout/invoice/' . $transaksi->invoice_number;
+                    $emailTemplate = ($transaksi->payment_status == 'success') ? 'emails.invoice-paid' : 'emails.invoice';
+                    
+                    Mail::send($emailTemplate, ['transaction' => $transaksi, 'linkInvoice' => $linkInvoice], function ($message) use ($transaksi) {
+                        $message->to($transaksi->customer_email, $transaksi->customer_name)
+                                ->subject('Status Pembayaran Pesanan ' . $transaksi->invoice_number);
+                    });
+                } catch (Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('Email failed: ' . $e->getMessage());
+                }
+            }
+
+            DB::commit();
+            return true;
+        } catch (Exception $e) {
+            DB::rollBack();
+            return false;
         }
     }
 }

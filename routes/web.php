@@ -67,9 +67,9 @@ Route::view('/about', 'about');
 Route::view('/checkout', 'checkout');
 Route::view('/custom-order', 'custom-order');
 
-Route::post('/checkout/process', [TransactionController::class, 'processCheckout'])->name('checkout.process');
+Route::post('/checkout/process', [TransactionController::class, 'processCheckout'])->name('checkout.process')->middleware('throttle:5,1');
 Route::get('/checkout/invoice/{invoice}', [TransactionController::class, 'checkoutInvoice'])->name('checkout.invoice');
-Route::post('/checkout/custom/process', [TransactionController::class, 'processCustomCheckout'])->name('checkout.custom.process');
+Route::post('/checkout/custom/process', [TransactionController::class, 'processCustomCheckout'])->name('checkout.custom.process')->middleware('throttle:5,1');
 
 // Midtrans Webhook Callback
-Route::post('/midtrans/callback', [PaymentCallbackController::class, 'callback']);
+Route::post('/midtrans/callback', [PaymentCallbackController::class, 'receive']);
