@@ -302,5 +302,38 @@ class AdminController extends Controller
         // Return file PDF
         return $pdf->stream('Laporan_Keuangan_AlFazza.pdf');
     }
+    
+        public function pesananIndex(Request $request)
+    {
+        // Ambil semua transaksi sukses, muat detail relasinya
+        $query = Transaction::with('details.product')
+                            ->where('payment_status', 'success');
 
+        // Filter berdasarkan Status Pesanan
+        if ($request->filled('status')) {
+            $query->where('order_status', $request->status);
+        }
+
+        // Filter berdasarkan Jenis Pesanan (Online, Custom, Kasir)
+        if ($request->filled('jenis')) {
+            $query->where('order_type', $request->jenis);
+        }
+
+        $pesanan = $query->orderBy('created_at', 'desc')->get();
+
+        return view('admin.pesanan.index', compact('pesanan'));
+    }
+
+    public function pesananUpdateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'order_status' => 'required|in:baru,diproses,dikirim,selesai'
+        ]);
+
+        Transaction::findOrFail($id)->update([
+            'order_status' => $request->order_status
+        ]);
+
+        return redirect()->route('admin.pesanan.index')->with('success', 'Status pesanan diperbarui!');
+    }
 }

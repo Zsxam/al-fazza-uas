@@ -75,6 +75,8 @@
                     <td>
                         @if($t->order_type == 'kasir')
                             <span style="color: #a67c52; font-weight: bold;"><i class="fa-solid fa-store"></i> Kasir (Offline)</span>
+                        @elseif($t->order_type == 'custom')
+                            <span style="color: #9b59b6; font-weight: bold;"><i class="fa-solid fa-cake-candles"></i> Custom Cake</span>
                         @else
                             <span style="color: #1976d2; font-weight: bold;"><i class="fa-solid fa-globe"></i> Web (Online)</span>
                         @endif

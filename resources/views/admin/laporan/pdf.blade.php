@@ -35,7 +35,15 @@
                 <td>{{ $index + 1 }}</td>
                 <td>{{ $t->created_at->format('d M Y, H:i') }}</td>
                 <td>{{ $t->invoice_number }}</td>
-                <td>{{ $t->order_type == 'kasir' ? 'Kasir (Offline)' : 'Web (Online)' }}</td>
+                <td>
+                    @if($t->order_type == 'kasir')
+                        Kasir (Offline)
+                    @elseif($t->order_type == 'custom')
+                        Custom Cake
+                    @else
+                        Web (Online)
+                    @endif
+                </td>
                 <td>{{ $t->payment_method ?? 'Cash' }}</td>
                 <td>Rp {{ number_format($t->total_amount, 0, ',', '.') }}</td>
             </tr>

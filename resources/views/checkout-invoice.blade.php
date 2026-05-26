@@ -25,6 +25,25 @@
                 <span style="color: #888;">Status</span>
                 <span style="background: {{ $ui['bg_color'] }}; color: {{ $ui['color'] }}; padding: 2px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold;">{{ $ui['badge'] }}</span>
             </div>
+                        <!-- Tambahan Data Pelanggan -->
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #ddd; padding-bottom: 8px; margin-bottom: 8px; margin-top: 15px;">
+                <span style="color: #888;">Nama Pelanggan</span>
+                <strong style="color: #333; text-align: right;">{{ $transaksi->customer_name }}<br><small>{{ $transaksi->customer_phone }}</small></strong>
+            </div>
+
+            @if($transaksi->order_type != 'kasir')
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #ddd; padding-bottom: 8px; margin-bottom: 8px;">
+                <span style="color: #888;">Alamat Pengiriman</span>
+                <span style="color: #333; text-align: right; max-width: 60%; font-size: 0.85rem;">{{ $transaksi->delivery_address ?? 'Ambil di Toko' }}</span>
+            </div>
+            @endif
+
+            @if($transaksi->order_type == 'custom')
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #ddd; padding-bottom: 8px; margin-bottom: 8px;">
+                <span style="color: #888;">Jenis Pesanan</span>
+                <span style="background: #9b59b6; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">Custom Cake</span>
+            </div>
+            @endif
             <div style="display: flex; justify-content: space-between; margin-top: 15px; font-size: 1.1rem;">
                 <strong>Total Bayar</strong>
                 <strong style="color: #a67c52;">Rp {{ number_format($transaksi->total_amount, 0, ',', '.') }}</strong>

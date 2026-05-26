@@ -46,6 +46,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/laporan', [AdminController::class, 'laporanIndex'])->name('admin.laporan.index');
     Route::get('/admin/laporan/pdf', [AdminController::class, 'laporanPdf'])->name('admin.laporan.pdf');
 
+    Route::get('/admin/pesanan', [AdminController::class, 'pesananIndex'])->name('admin.pesanan.index');
+    Route::put('/admin/pesanan/{id}/status', [AdminController::class, 'pesananUpdateStatus'])->name('admin.pesanan.updateStatus');
+
 });
 
 // 3. Rute Khusus Kasir

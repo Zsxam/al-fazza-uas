@@ -40,10 +40,14 @@ class TransactionController extends Controller
                 'user_id' => Auth::id() ?? null, 
                 'customer_name' => $request->customer_name,
                 'customer_email' => $request->customer_email,
+                
+                'customer_phone' => $request->customer_phone,
+                'delivery_address' => $request->delivery_address,
+                
                 'total_amount' => $request->total_price,
                 'payment_status' => 'pending',
-                'order_type' => 'online',
-                'payment_method' => 'Midtrans (Pending)', // Set default sementara
+                'order_type' => 'online', // Pesanan biasa
+                'payment_method' => 'Midtrans (Pending)',
                 'amount_paid' => 0,
             ]);
 
@@ -117,12 +121,15 @@ class TransactionController extends Controller
             $transaction->user_id = \Illuminate\Support\Facades\Auth::id() ?? null;
             $transaction->customer_name = $request->customer_name;
             $transaction->customer_email = $request->customer_email;
-            $transaction->order_type = 'online'; 
+            $transaction->customer_phone = $request->customer_phone;
+            $transaction->delivery_address = $request->delivery_address;
+            $transaction->custom_details = $request->custom_details; 
+            $transaction->order_type = 'custom-order'; 
             $transaction->total_amount = $request->total_price;
             $transaction->payment_status = 'pending';
             $transaction->payment_method = 'Midtrans';
             $transaction->amount_paid = 0;
-            $transaction->save(); // Simpan paksa ke database
+            $transaction->save();
 
             // 3. Siapkan Data untuk Midtrans
             $params = [

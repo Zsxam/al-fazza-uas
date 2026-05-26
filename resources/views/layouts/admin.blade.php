@@ -19,6 +19,9 @@
         <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
             <i class="fa-solid fa-house"></i> Dashboard
         </a>
+        <a href="{{ route('admin.pesanan.index') }}" class="{{ request()->routeIs('admin.pesanan.*') ? 'active' : '' }}">
+            <i class="fa-solid fa-clipboard-list"></i> Kelola Pesanan
+        </a>
         <a href="{{ route('admin.produk.index') }}" class="{{ request()->routeIs('admin.produk.*') ? 'active' : '' }}">
             <i class="fa-solid fa-bread-slice"></i> Kelola Produk
         </a>
