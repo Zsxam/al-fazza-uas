@@ -38,7 +38,7 @@
             </div>
             @endif
 
-            @if($transaksi->order_type == 'custom')
+            @if($transaksi->order_type == 'custom-order')
             <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #ddd; padding-bottom: 8px; margin-bottom: 8px;">
                 <span style="color: #888;">Jenis Pesanan</span>
                 <span style="background: #9b59b6; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">Custom Cake</span>

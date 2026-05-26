@@ -234,20 +234,7 @@ function renderCheckoutSummary() {
     document.getElementById('checkout-grandtotal').textContent = `Rp ${grandTotal.toLocaleString('id-ID')}`;
 }
 
-function prosesCheckoutWA() {
-    const form = ['nama', 'nohp', 'alamat'].map(id => document.getElementById(id).value);
-    if (form.includes('')) return alert("Lengkapi Nama, No HP, dan Alamat!");
 
-    let wa = `Halo *AL-Fazza Bakery*, saya pesan:\n\n*PEMESAN*\nNama: ${form[0]}\nHP: ${form[1]}\nAlamat: ${form[2]}\n\n*PESANAN*\n`;
-    let total = 0;
-    
-    cart.forEach(i => {
-        let sub = i.price * i.quantity; total += sub;
-        wa += `- ${i.quantity}x ${i.name} (Rp ${sub.toLocaleString('id-ID')})\n`;
-    });
-    
-    window.open(`https://wa.me/6281221315946?t  ext=${encodeURIComponent(wa + `\n*Total: Rp ${total.toLocaleString('id-ID')}*`)}`);
-}
 
 // Fungsi untuk menambah Qty di keranjang
 function tambahQty(index) {

@@ -3,368 +3,153 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 use App\Models\Transaction;
-use App\Models\TransactionDetail;
-use App\Models\Product;
-use App\Models\InventoryLog;
-use App\Mail\InvoiceMail;
-use Illuminate\Support\Facades\DB;
-use Midtrans\Config;
-use Midtrans\Snap;
+use App\Services\CheckoutService;
+use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
 {
-    public function __construct()
-    {
-        // Set konfigurasi Midtrans
-        Config::$serverKey = config('midtrans.server_key');
-        Config::$isProduction = config('midtrans.is_production');
-        Config::$isSanitized = config('midtrans.is_sanitized');
-        Config::$is3ds = config('midtrans.is_3ds');
+    protected $checkoutService;
 
-        Config::$curlOptions = [
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_HTTPHEADER => [] // <-- Tambahan penyembuh error 10023
-        ];
+    public function __construct(CheckoutService $checkoutService)
+    {
+        $this->checkoutService = $checkoutService;
     }
 
     public function processCheckout(Request $request)
     {
-        DB::beginTransaction();
-        try {
-            $invoice = 'ALF-' . date('YmdHis');
-            
-            // 1. Hitung ulang total secara server-side dan validasi stok
-            $serverGrandTotal = 0;
-            $validItems = [];
+        $customerData = [
+            'user_id' => Auth::id() ?? null,
+            'customer_name' => $request->customer_name,
+            'customer_email' => $request->customer_email,
+            'customer_phone' => $request->customer_phone,
+            'delivery_date' => $request->delivery_date,
+            'delivery_address' => $request->delivery_address,
+            'notes' => $request->notes,
+        ];
 
-            if ($request->items) {
-                foreach ($request->items as $item) {
-                    // Cek jika keranjang versi lama (tidak ada ID)
-                    if (!isset($item['id'])) {
-                        DB::rollBack();
-                        return response()->json(['error' => 'Format keranjang sudah usang. Mohon kosongkan keranjang Anda dan tambahkan ulang produk.'], 400);
-                    }
+        $result = $this->checkoutService->processCheckout(
+            $request->items,
+            $customerData,
+            'online',
+            'Midtrans (Pending)',
+            0,
+            0,
+            'pending'
+        );
 
-                    $product = Product::find($item['id']);
-                    
-                    if (!$product) {
-                        DB::rollBack();
-                        return response()->json(['error' => 'Produk tidak ditemukan!'], 400);
-                    }
-
-                    if ($product->stok < $item['quantity']) {
-                        DB::rollBack();
-                        return response()->json(['error' => 'Stok ' . $product->nama . ' tidak mencukupi! Sisa stok: ' . $product->stok], 400);
-                    }
-
-                    $subtotal = $product->harga * $item['quantity'];
-                    $serverGrandTotal += $subtotal;
-
-                    // Simpan data untuk dimasukkan ke TransactionDetail nanti
-                    $validItems[] = [
-                        'product_id' => $product->id,
-                        'qty' => $item['quantity'],
-                        'price' => $product->harga,
-                        'subtotal' => $subtotal,
-                        'nama_produk' => $product->nama // Untuk log
-                    ];
-                }
-            } else {
-                DB::rollBack();
-                return response()->json(['error' => 'Keranjang kosong!'], 400);
-            }
-
-            // 2. Simpan Transaksi Utama
-            $transaction = Transaction::create([
-                'invoice_number' => $invoice,
-                'user_id' => Auth::id() ?? null, 
-                'customer_name' => $request->customer_name,
-                'customer_email' => $request->customer_email,
-                'customer_phone' => $request->customer_phone,
-                'delivery_address' => $request->delivery_address,
-                'delivery_date' => $request->delivery_date,
-                'notes' => $request->notes,
-                'total_amount' => $serverGrandTotal,
-                'payment_status' => 'pending',
-                'order_type' => 'online', // Pesanan biasa
-                'payment_method' => 'Midtrans (Pending)',
-                'amount_paid' => 0,
-            ]);
-
-            // 3. SIMPAN RINCIAN PESANAN & POTONG STOK
-            foreach ($validItems as $vItem) {
-                TransactionDetail::create([
-                    'transaction_id' => $transaction->id,
-                    'product_id' => $vItem['product_id'],
-                    'qty' => $vItem['qty'],
-                    'price' => $vItem['price'],
-                    'subtotal' => $vItem['subtotal'],
-                ]);
-
-                // Pemotongan Stok Langsung
-                $product = Product::find($vItem['product_id']);
-                $product->decrement('stok', $vItem['qty']);
-
-                // Catat Log Keluar
-                InventoryLog::create([
-                    'product_id' => $product->id,
-                    'tipe' => 'keluar',
-                    'jumlah' => $vItem['qty'],
-                    'keterangan' => 'Booking Online (' . $invoice . ')',
-                ]);
-            }
-
-            // 4. Siapkan data untuk dikirim ke Midtrans
-            $params = [
-                'transaction_details' => [
-                    'order_id' => $invoice,
-                    'gross_amount' => (int) $serverGrandTotal,
-                ],
-                'customer_details' => [
-                    'first_name' => $request->customer_name,
-                    'phone' => $request->customer_phone,
-                ],
-            ];
-
-            // 5. Minta Snap Token dari Midtrans
-            $snapToken = Snap::getSnapToken($params);
-            
-            // SIMPAN TOKEN KE DATABASE
-            $transaction->update([
-                'snap_token' => $snapToken
-            ]);
-
-            DB::commit();
-
-            // // === TAMBAHAN BARU: KIRIM EMAIL KE PEMBELI ===
-            // if ($request->customer_email) {
-            //     // Buat link yang akan diklik pembeli di email
-            //     $linkInvoice = url('/checkout/invoice/' . $invoice);
-            //     try {
-            //         Mail::to($request->customer_email)->send(new InvoiceMail($transaction, $linkInvoice));
-            //     } catch (\Exception $e) {
-            //         \Log::error("Gagal mengirim email invoice: " . $e->getMessage());
-            //     }
-            // }
-            
-            return response()->json([
-                'snap_token' => $snapToken,
-                'invoice' => $invoice
-            ]);
-            
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['error' => $e->getMessage()], 500);
+        if (!$result['success']) {
+            return response()->json(['error' => $result['message']], 500);
         }
-    }
-    public function processCustomCheckout(Request $request)
-    {
-        try {
-            // 1. Buat Nomor Invoice Khusus Custom Cake
-            $invoice = 'ALF-CUST-' . date('YmdHis');
 
-            // 2. SIMPAN TRANSAKSI (PAKAI JALUR VVIP BIAR ANTI ERROR)
-            $transaction = new Transaction();
-            $transaction->invoice_number = $invoice;
-            $transaction->user_id = Auth::id() ?? null;
-            $transaction->customer_name = $request->customer_name;
-            $transaction->customer_email = $request->customer_email;
-            $transaction->customer_phone = $request->customer_phone;
-            $transaction->delivery_address = $request->delivery_address;
-            $transaction->delivery_date = $request->delivery_date; 
-            $transaction->notes = $request->notes; 
-            $transaction->custom_details = $request->custom_details; 
-            $transaction->order_type = 'custom-order'; 
-            $transaction->total_amount = $request->total_price;
-            $transaction->payment_status = 'pending';
-            $transaction->payment_method = 'Midtrans';
-            $transaction->amount_paid = 0;
-            $transaction->save();
-
-            // 3. Siapkan Data untuk Midtrans
-            $params = [
-                'transaction_details' => [
-                    'order_id' => $invoice,
-                    'gross_amount' => $request->total_price,
-                ],
-                'customer_details' => [
-                    'first_name' => $request->customer_name,
-                    'email' => $request->customer_email,
-                    'phone' => $request->customer_phone,
-                ],
-            ];
-
-            // 4. Minta Token Midtrans & Simpan
-            $snapToken = \Midtrans\Snap::getSnapToken($params);
-            
-            $transaction->update([
-                'snap_token' => $snapToken
-            ]);
-
-            // // 5. Kirim Email Tagihan Pending 
-            // if ($request->customer_email) {
-            //     $linkInvoice = config('app.url') . '/checkout/invoice/' . $invoice;
-            //     try {
-            //         \Illuminate\Support\Facades\Mail::to($request->customer_email)->send(new \App\Mail\InvoiceMail($transaction, $linkInvoice));
-            //     } catch (\Exception $e) {
-            //         \Log::error("Gagal mengirim email invoice Custom: " . $e->getMessage());
-            //     }
-            // }
-            
-            return response()->json([
-                'snap_token' => $snapToken,
-                'invoice' => $invoice
-            ]);
-            
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
+        return response()->json([
+            'snap_token' => $result['snap_token'],
+            'invoice' => $result['invoice']
+        ]);
     }
 
     public function checkoutInvoice($invoice)
     {
-        $transaksi = Transaction::where('invoice_number', $invoice)->firstOrFail();
+        $transaksi = Transaction::with('details.product')->where('invoice_number', $invoice)->firstOrFail();
         
-        $snapToken = null; // Set default kosong
-
+        $ui = [];
         if ($transaksi->payment_status == 'success') {
             $ui = [
-                'color' => '#2e7d32',        // Hijau
-                'bg_color' => '#e8f5e9',     // Hijau Muda
-                'icon' => 'fa-circle-check',
+                'color' => '#388e3c',
+                'bg_color' => '#e8f5e9',
+                'icon' => 'fa-check',
                 'title' => 'Pembayaran Berhasil!',
-                'message' => 'Terima kasih telah berbelanja di Al-Fazza Bakery. Pesanan Anda sedang kami proses.',
+                'message' => 'Terima kasih, pesanan Anda sedang kami proses.',
                 'badge' => 'LUNAS'
+            ];
+        } else if ($transaksi->payment_status == 'pending') {
+            $ui = [
+                'color' => '#ef6c00',
+                'bg_color' => '#fff3e0',
+                'icon' => 'fa-clock',
+                'title' => 'Menunggu Pembayaran',
+                'message' => 'Selesaikan pembayaran sebelum batas waktu habis.',
+                'badge' => 'PENDING'
             ];
         } else {
             $ui = [
-                'color' => '#ef6c00',        // Oranye
-                'bg_color' => '#fff3e0',     // Oranye Muda
-                'icon' => 'fa-clock',
-                'title' => 'Menunggu Pembayaran',
-                'message' => 'Silakan selesaikan pembayaran Anda sebelum batas waktu habis.',
-                'badge' => 'PENDING'
+                'color' => '#d32f2f',
+                'bg_color' => '#ffebee',
+                'icon' => 'fa-xmark',
+                'title' => 'Pembayaran Gagal/Kedaluwarsa',
+                'message' => 'Mohon maaf, transaksi Anda telah dibatalkan.',
+                'badge' => 'GAGAL'
             ];
-
-            // SIHIR REGENERASI TOKEN: Jika pending, minta token baru ke Midtrans secara live
-            try {
-                $params = [
-                    'transaction_details' => [
-                        'order_id' => $transaksi->invoice_number,
-                        'gross_amount' => (int) $transaksi->total_amount,
-                    ],
-                    'customer_details' => [
-                        'first_name' => $transaksi->customer_name,
-                    ],
-                ];
-                $snapToken = \Midtrans\Snap::getSnapToken($params);
-            } catch (\Exception $e) {
-                \Log::error("Gagal regenerasi Snap Token di Invoice: " . $e->getMessage());
-            }
         }
-        
-        return view('checkout-invoice', compact('transaksi', 'ui', 'snapToken'));
+
+        return view('checkout-invoice', compact('transaksi', 'ui'));
     }
 
-    public function callback(Request $request)
+    public function processCustomCheckout(Request $request)
     {
-        $serverKey = config('midtrans.server_key');
+        $request->validate([
+            'customer_name' => 'required|string|max:255',
+            'customer_email' => 'required|email|max:255',
+            'customer_phone' => 'required|string|max:20',
+            'delivery_date' => 'required|date',
+            'delivery_address' => 'required|string',
+            'custom_details' => 'required|string',
+        ]);
+
+        $invoice = 'CST-' . date('YmdHis');
+        $totalAmount = $request->total_price ?? 150000;
         
-        $grossAmount = number_format($request->gross_amount, 0, '.', '');
-        $hashed = hash("sha512", $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
-        
-        \Log::info("Midtrans Callback Masuk. Invoice: {$request->order_id}, Status: {$request->transaction_status}");
+        $transaction = Transaction::create([
+            'invoice_number' => $invoice,
+            'user_id' => Auth::id() ?? null,
+            'customer_name' => $request->customer_name,
+            'customer_email' => $request->customer_email,
+            'customer_phone' => $request->customer_phone,
+            'delivery_date' => $request->delivery_date,
+            'delivery_address' => $request->delivery_address,
+            'notes' => $request->custom_details . "\nCatatan Tambahan: " . ($request->notes ?? '-'),
+            'order_type' => 'custom-order',
+            'total_amount' => $totalAmount, 
+            'payment_status' => 'pending',
+            'payment_method' => 'Midtrans (Pending)',
+        ]);
 
-        if ($hashed == $request->signature_key) {
-            
-            // 1. Cari Transaksi berdasarkan Nomor Invoice
-            $transaction = Transaction::where('invoice_number', $request->order_id)->first();
-            
-            if ($transaction) {
-                
-                // KONDISI A: LUNAS (Success / Settlement / Capture)
-                if ($request->transaction_status == 'capture' || $request->transaction_status == 'settlement') {
-                    
-                    if ($transaction->payment_status == 'pending') {
-                        $metodeBayar = strtoupper(str_replace('_', ' ', $request->payment_type));
-                        
-                        // Update transaksi jadi lunas
-                        $transaction->update([
-                            'payment_status' => 'success',
-                            'payment_method' => $metodeBayar,
-                            'amount_paid' => $request->gross_amount,
-                        ]);
+        // Konfigurasi Midtrans
+        \Midtrans\Config::$serverKey = config('midtrans.server_key');
+        \Midtrans\Config::$isProduction = config('midtrans.is_production', false);
+        \Midtrans\Config::$isSanitized = true;
+        \Midtrans\Config::$is3ds = true;
+        \Midtrans\Config::$curlOptions = [
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_SSL_VERIFYPEER => 0,
+            CURLOPT_HTTPHEADER => [], // Fix bug SDK Midtrans (Undefined array key 10023)
+        ];
 
-                        // EMAIL 1: KIRIM EMAIL LUNAS
-                        if ($transaction->customer_email) {
-                            $linkInvoice = config('app.url') . '/checkout/invoice/' . $transaction->invoice_number;
-                            try {
-                                \Illuminate\Support\Facades\Mail::to($transaction->customer_email)->send(new \App\Mail\InvoicePaidMail($transaction, $linkInvoice));
-                            } catch (\Exception $e) {
-                                \Log::error("Gagal mengirim email lunas: " . $e->getMessage());
-                            }
-                        }
-                        \Log::info("Invoice {$request->order_id} BERHASIL Lunas.");
-                    }
-                } 
-                
-                // KONDISI B: PENDING (Pembeli baru memilih metode bayar, misal milih BCA VA)
-                else if ($request->transaction_status == 'pending') {
-                    
-                    $metodeBayar = strtoupper(str_replace('_', ' ', $request->payment_type));
-                    
-                    // Update nama metode bayarnya di database biar admin tahu
-                    $transaction->update([
-                        'payment_method' => $metodeBayar . ' (Pending)'
-                    ]);
+        $params = [
+            'transaction_details' => [
+                'order_id' => $invoice,
+                'gross_amount' => (int) $totalAmount,
+            ],
+            'customer_details' => [
+                'first_name' => $request->customer_name,
+                'email' => $request->customer_email,
+                'phone' => $request->customer_phone,
+            ],
+        ];
 
-                    // EMAIL 2: KIRIM EMAIL TAGIHAN PENDING
-                    if ($transaction->customer_email) {
-                        $linkInvoice = config('app.url') . '/checkout/invoice/' . $transaction->invoice_number;
-                        try {
-                            \Illuminate\Support\Facades\Mail::to($transaction->customer_email)->send(new \App\Mail\InvoiceMail($transaction, $linkInvoice));
-                        } catch (\Exception $e) {
-                            \Log::error("Gagal mengirim email pending: " . $e->getMessage());
-                        }
-                    }
-                    \Log::info("Invoice {$request->order_id} Pending. Email Tagihan Dikirim.");
-                }
-                
-                // KONDISI C: GAGAL / EXPIRED (Batal Bayar)
-                else if (in_array($request->transaction_status, ['deny', 'cancel', 'expire', 'failure'])) {
-                    if ($transaction->payment_status == 'pending') {
-                        // Update status transaksi
-                        $transaction->update([
-                            'payment_status' => 'failed'
-                        ]);
+        try {
+            $snapToken = \Midtrans\Snap::getSnapToken($params);
+            $transaction->update(['snap_token' => $snapToken]);
 
-                        // Kembalikan Stok Barang (Restore)
-                        if ($transaction->details) {
-                            foreach ($transaction->details as $detail) {
-                                $product = Product::find($detail->product_id);
-                                if ($product) {
-                                    $product->increment('stok', $detail->qty);
-                                    InventoryLog::create([
-                                        'product_id' => $product->id,
-                                        'tipe' => 'masuk',
-                                        'jumlah' => $detail->qty,
-                                        'keterangan' => 'Restore Stok Gagal Bayar (' . $transaction->invoice_number . ')',
-                                    ]);
-                                }
-                            }
-                        }
-                        \Log::info("Invoice {$request->order_id} Batal/Expired. Stok dikembalikan.");
-                    }
-                }
-
-            }
-        } else {
-            \Log::error("Verifikasi Signature Midtrans GAGAL untuk Invoice: {$request->order_id}");
+            return response()->json([
+                'success' => true,
+                'snap_token' => $snapToken,
+                'invoice' => $invoice
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
         }
-        
-        return response()->json(['message' => 'Callback diproses']);
     }
 }
