@@ -122,7 +122,7 @@
                         <form action="{{ route('admin.pesanan.updateStatus', $p->id) }}" method="POST">
                             @csrf
                             @method('PUT')
-                            <select name="order_status" onchange="this.form.submit()" style="padding: 6px; border-radius: 4px; width: 100%;">
+                            <select name="order_status" onchange="confirmStatusChange(this)" style="padding: 6px; border-radius: 4px; width: 100%;">
                                 <option value="baru" {{ $p->order_status == 'baru' ? 'selected' : '' }}>Baru</option>
                                 <option value="diproses" {{ $p->order_status == 'diproses' ? 'selected' : '' }}>Diproses</option>
                                 <option value="dikirim" {{ $p->order_status == 'dikirim' ? 'selected' : '' }}>Dikirim</option>
@@ -139,4 +139,29 @@
             </tbody>
         </table>
     </div>
+
+    {{-- Navigasi Halaman --}}
+    <div style="margin-top: 15px;">
+        {{ $pesanan->links('vendor.pagination.admin') }}
+    </div>
 @endsection
+
+@push('scripts')
+<script>
+function confirmStatusChange(selectEl) {
+    const label = selectEl.options[selectEl.selectedIndex].text;
+    const confirmed = confirm('Ubah status pesanan menjadi "' + label + '"?\n\nPastikan perubahan ini sudah benar sebelum melanjutkan.');
+    if (confirmed) {
+        selectEl.form.submit();
+    } else {
+        // Kembalikan ke nilai sebelumnya (sebelum user geser dropdown)
+        selectEl.value = selectEl.dataset.original ?? selectEl.value;
+    }
+}
+
+// Simpan nilai awal setiap dropdown agar bisa di-reset jika batal
+document.querySelectorAll('select[name="order_status"]').forEach(function(el) {
+    el.dataset.original = el.value;
+});
+</script>
+@endpush

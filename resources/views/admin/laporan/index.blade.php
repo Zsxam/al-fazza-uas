@@ -96,6 +96,11 @@
         </table>
     </div>
 
+    {{-- Navigasi Halaman --}}
+    <div style="margin-top: 15px;">
+        {{ $transaksi->links('vendor.pagination.admin') }}
+    </div>
+
     <style>
         @media print {
             body * { visibility: hidden; }

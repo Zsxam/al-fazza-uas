@@ -18,10 +18,14 @@ class CustomCheckoutRequest extends FormRequest
             'customer_email' => 'required|email|max:255',
             'customer_phone' => 'required|string|max:20',
             'delivery_date' => 'required|date',
-            'delivery_address' => 'required|string',
+            // nullable karena user bisa pilih "Ambil di Toko" tanpa perlu alamat
+            'delivery_address' => 'nullable|string',
             'custom_details' => 'required|string',
             'notes' => 'nullable|string',
-            'total_price' => 'nullable|numeric|min:150000',
+            // ukuran dikirim dari client untuk kalkulasi harga server-side
+            'ukuran' => 'required|string|in:16 cm,18 cm,20 cm,22 cm,24 cm,30 cm',
+            // total_price tidak dipercaya lagi dari client, hanya sebagai fallback dummy
+            'total_price' => 'nullable|numeric',
         ];
     }
 

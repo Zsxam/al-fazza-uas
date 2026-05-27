@@ -418,11 +418,12 @@ function prosesCustomOrderMidtrans() {
 
     fetch("/checkout/custom/process", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": csrfToken.getAttribute('content') },
+        headers: { "Content-Type": "application/json", "Accept": "application/json", "X-CSRF-TOKEN": csrfToken.getAttribute('content') },
         body: JSON.stringify({
             customer_name: nama,
             customer_email: email,
             customer_phone: nohp,
+            ukuran: ukuran,        // Dikirim ke server untuk kalkulasi harga server-side
             total_price: hargaCustomCake,
             delivery_address: alamat,
             custom_details: detailKue,
@@ -709,7 +710,7 @@ function payNow() {
 
     fetch("/checkout/process", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": csrfToken.getAttribute('content') },
+        headers: { "Content-Type": "application/json", "Accept": "application/json", "X-CSRF-TOKEN": csrfToken.getAttribute('content') },
         body: JSON.stringify({
             total_price: grandTotal, 
             items: cart,

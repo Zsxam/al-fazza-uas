@@ -94,7 +94,18 @@ class TransactionController extends Controller
         $data = $request->validated();
         
         $invoice = 'CST-' . date('YmdHis');
-        $totalAmount = $data['total_price'] ?? 150000;
+
+        // Harga dihitung server-side berdasarkan ukuran kue yang tervalidasi.
+        // Ini mencegah manipulasi harga dari sisi client.
+        $pricemap = [
+            '16 cm' => 150000,
+            '18 cm' => 180000,
+            '20 cm' => 220000,
+            '22 cm' => 260000,
+            '24 cm' => 300000,
+            '30 cm' => 450000,
+        ];
+        $totalAmount = $pricemap[$data['ukuran']] ?? 150000;
         
         $data['user_id'] = Auth::id() ?? null;
 

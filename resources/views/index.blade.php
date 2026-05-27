@@ -5,7 +5,7 @@
         <div class="hero-content">
             <h1>Pisang Bolen</h1>
             <p>Perpaduan pisang dan cokelat lumer atau keju gurih yang dibalut kulit pastry berlapis yang renyah di luar namun lembut di dalam.</p>
-            <button class="btn-buy" onclick="window.location.href='{{ url('/detail?id=49') }}'">Beli Sekarang</button>
+            <button class="btn-buy" onclick="window.location.href='{{ url('/detail/25') }}'">Beli Sekarang</button>
         </div>
         <div class="hero-image">
             <img src="{{ asset('assets/img/pisangbolen 1.png') }}" alt="Pisang Bolen">
@@ -15,19 +15,11 @@
     <section class="brown-section">
             <h2>Terlaris</h2>
             <div class="item-list">
-                <div class="circular-item" onclick="window.location.href='{{ url('/detail?id=49') }}'">
-                    <img src="{{ asset('assets/img/pisangbolen 1.png') }}" alt="Pisang Bolen">
+                @foreach($terlaris as $item)
+                <div class="circular-item" onclick="window.location.href='{{ url('/detail/') }}/{{ $item->id }}'">
+                    <img src="{{ asset($item->gambar) }}" alt="{{ $item->nama }}">
                 </div>
-                
-                <div class="circular-item" onclick="window.location.href='{{ url('/detail?id=50') }}'">
-                    <img src="{{ asset('assets/img/cheeseroll 1.png') }}" alt="Cheese Roll">
-                </div>
-                <div class="circular-item" onclick="window.location.href='{{ url('/detail?id=51') }}'">
-                    <img src="{{ asset('assets/img/krasong 1.png') }}" alt="Krasong">
-                </div>
-                <div class="circular-item" onclick="window.location.href='{{ url('/detail?id=52') }}'">
-                    <img src="{{ asset('assets/img/corong 1.png') }}" alt="Kue Corong">
-                </div>
+                @endforeach
             </div>
         </section>
 

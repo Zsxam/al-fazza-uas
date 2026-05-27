@@ -20,7 +20,7 @@ Route::get('/detail/{id}', [ProductController::class, 'detail']);
 // RUTE GUEST (Belum login)
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 });
     
 // RUTE BACKEND UMUM

@@ -25,8 +25,21 @@ class KasirController extends Controller
 
     public function prosesPos(Request $request)
     {
+        // Validasi dasar input form kasir
+        $request->validate([
+            'cart_data'      => 'required|string',
+            'payment_method' => 'required|string|in:Cash,QRIS,Transfer',
+            'amount_paid'    => 'required|numeric|min:0',
+            'change_amount'  => 'required|numeric|min:0',
+        ]);
+
         $cartData = json_decode($request->cart_data, true);
-        
+
+        // Cek apakah JSON valid dan tidak kosong
+        if (!is_array($cartData) || count($cartData) === 0) {
+            return redirect()->back()->with('error', 'Data keranjang tidak valid atau kosong. Silakan tambahkan produk terlebih dahulu.');
+        }
+
         $customerData = [
             'user_id' => Auth::id(),
             'customer_name' => 'Pelanggan Toko',

@@ -51,4 +51,9 @@
             </tbody>
         </table>
     </div>
+
+    {{-- Navigasi Halaman --}}
+    <div style="margin-top: 15px;">
+        {{ $logs->links('vendor.pagination.admin') }}
+    </div>
 @endsection

@@ -78,34 +78,26 @@ class CheckoutService
                     'subtotal' => $vItem['subtotal'],
                 ]);
 
-                $product = Product::find($vItem['product_id']);
-                $product->decrement('stok', $vItem['qty']);
+                // Untuk order kasir: langsung kurangi stok karena pembayaran tunai/langsung
+                // Untuk order online: stok BELUM dikurangi di sini.
+                // Stok akan dikurangi oleh handleMidtransCallback saat status menjadi 'success'.
+                if ($orderType === 'kasir') {
+                    $product = Product::find($vItem['product_id']);
+                    $product->decrement('stok', $vItem['qty']);
 
-                $logKeterangan = ($orderType === 'kasir') ? 'Terjual via Kasir (' . $invoice . ')' : 'Booking Online (' . $invoice . ')';
-
-                InventoryLog::create([
-                    'product_id' => $product->id,
-                    'tipe' => 'keluar',
-                    'jumlah' => $vItem['qty'],
-                    'keterangan' => $logKeterangan,
-                ]);
+                    InventoryLog::create([
+                        'product_id' => $product->id,
+                        'tipe' => 'keluar',
+                        'jumlah' => $vItem['qty'],
+                        'keterangan' => 'Terjual via Kasir (' . $invoice . ')',
+                    ]);
+                }
             }
 
             $snapToken = null;
             if ($orderType !== 'kasir') {
                 
-                // Konfigurasi Midtrans
-                Config::$serverKey = config('midtrans.server_key');
-                Config::$isProduction = config('midtrans.is_production', false);
-                Config::$isSanitized = true;
-                Config::$is3ds = true;
-
-                // Bypass SSL untuk Localhost (Windows/XAMPP)
-                Config::$curlOptions = [
-                    CURLOPT_SSL_VERIFYHOST => 0,
-                    CURLOPT_SSL_VERIFYPEER => 0,
-                    CURLOPT_HTTPHEADER => [], // Fix bug SDK Midtrans (Undefined array key 10023)
-                ];
+                $this->configureMidtrans();
 
                 $params = [
                     'transaction_details' => [
@@ -173,16 +165,7 @@ class CheckoutService
                 'payment_method' => 'Midtrans (Pending)',
             ]);
 
-            // Konfigurasi Midtrans
-            Config::$serverKey = config('midtrans.server_key');
-            Config::$isProduction = config('midtrans.is_production', false);
-            Config::$isSanitized = true;
-            Config::$is3ds = true;
-            Config::$curlOptions = [
-                CURLOPT_SSL_VERIFYHOST => 0,
-                CURLOPT_SSL_VERIFYPEER => 0,
-                CURLOPT_HTTPHEADER => [],
-            ];
+            $this->configureMidtrans();
 
             $params = [
                 'transaction_details' => [
@@ -232,15 +215,7 @@ class CheckoutService
     {
         DB::beginTransaction();
         try {
-            Config::$serverKey = config('midtrans.server_key');
-            Config::$isProduction = config('midtrans.is_production', false);
-            Config::$isSanitized = true;
-            Config::$is3ds = true;
-            Config::$curlOptions = [
-                CURLOPT_SSL_VERIFYHOST => 0,
-                CURLOPT_SSL_VERIFYPEER => 0,
-                CURLOPT_HTTPHEADER => [],
-            ];
+            $this->configureMidtrans();
 
             $notif = new \Midtrans\Notification();
 
@@ -261,32 +236,24 @@ class CheckoutService
                         $transaksi->update(['payment_status' => 'pending']);
                     } else {
                         $transaksi->update(['payment_status' => 'success', 'payment_method' => $type, 'amount_paid' => $notif->gross_amount]);
+                        // Kurangi stok setelah pembayaran kartu kredit dikonfirmasi sukses
+                        if ($transaksi->order_type == 'online') {
+                            $this->kurangiStokOnline($transaksi, $order_id);
+                        }
                     }
                 }
             } else if ($transaction == 'settlement') {
                 $transaksi->update(['payment_status' => 'success', 'payment_method' => $type, 'amount_paid' => $notif->gross_amount]);
+                // Kurangi stok setelah pembayaran online dikonfirmasi settlement (sukses)
+                if ($transaksi->order_type == 'online') {
+                    $this->kurangiStokOnline($transaksi, $order_id);
+                }
             } else if ($transaction == 'pending') {
                 $transaksi->update(['payment_status' => 'pending']);
             } else if ($transaction == 'deny' || $transaction == 'expire' || $transaction == 'cancel') {
                 $transaksi->update(['payment_status' => 'failed']);
-                
-                if ($transaksi->order_type == 'online') {
-                    // Kembalikan stok
-                    $details = TransactionDetail::where('transaction_id', $transaksi->id)->get();
-                    foreach ($details as $detail) {
-                        $product = Product::find($detail->product_id);
-                        if ($product) {
-                            $product->increment('stok', $detail->qty);
-                            
-                            InventoryLog::create([
-                                'product_id' => $product->id,
-                                'tipe' => 'masuk',
-                                'jumlah' => $detail->qty,
-                                'keterangan' => 'Pembatalan Transaksi (' . $order_id . ')',
-                            ]);
-                        }
-                    }
-                }
+                // Untuk order online: stok tidak perlu dikembalikan karena memang belum pernah dikurangi.
+                // (Pengurangan stok hanya terjadi saat settlement/capture sukses di atas)
             }
 
             if ($transaksi->customer_email && in_array($transaksi->payment_status, ['success', 'failed'])) {
@@ -308,6 +275,50 @@ class CheckoutService
         } catch (Exception $e) {
             DB::rollBack();
             return false;
+        }
+    }
+
+    /**
+     * Konfigurasi Midtrans SDK — dipanggil sebelum setiap operasi Midtrans.
+     * SSL bypass hanya diaktifkan di environment local (localhost/XAMPP).
+     */
+    private function configureMidtrans()
+    {
+        Config::$serverKey    = config('midtrans.server_key');
+        Config::$isProduction = config('midtrans.is_production', false);
+        Config::$isSanitized  = true;
+        Config::$is3ds        = true;
+
+        // Bypass verifikasi SSL hanya di environment local.
+        // Di production, SSL harus tetap aktif untuk keamanan transaksi.
+        if (app()->environment('local')) {
+            Config::$curlOptions = [
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_SSL_VERIFYPEER => 0,
+                CURLOPT_HTTPHEADER     => [], // Fix bug SDK Midtrans (Undefined array key 10023)
+            ];
+        }
+    }
+
+    /**
+     * Kurangi stok produk setelah pembayaran online dikonfirmasi sukses oleh Midtrans.
+     * Dipanggil dari handleMidtransCallback saat status settlement atau capture+success.
+     */
+    private function kurangiStokOnline($transaksi, $order_id)
+    {
+        $details = TransactionDetail::where('transaction_id', $transaksi->id)->get();
+        foreach ($details as $detail) {
+            $product = Product::find($detail->product_id);
+            if ($product) {
+                $product->decrement('stok', $detail->qty);
+
+                InventoryLog::create([
+                    'product_id' => $product->id,
+                    'tipe'       => 'keluar',
+                    'jumlah'     => $detail->qty,
+                    'keterangan' => 'Terjual Online (' . $order_id . ')',
+                ]);
+            }
         }
     }
 }

@@ -22,7 +22,7 @@ class OrderController extends Controller
             $query->where('order_type', $request->jenis);
         }
 
-        $pesanan = $query->orderBy('created_at', 'desc')->get();
+        $pesanan = $query->orderBy('created_at', 'desc')->paginate(15)->withQueryString();
 
         return view('admin.pesanan.index', compact('pesanan'));
     }
