@@ -12,6 +12,13 @@
         <p>Selamat datang, <strong>{{ Auth::user()->name }}</strong></p>
     </div>
 
+    @if($stokMenipis->count() > 0)
+    <div style="background: #ffebee; color: #d32f2f; padding: 15px 20px; border-radius: 8px; border-left: 5px solid #d32f2f; margin-bottom: 20px; font-weight: bold; display: flex; align-items: center; gap: 10px;">
+        <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.5rem;"></i>
+        <span>Peringatan Darurat: Terdapat {{ $stokMenipis->count() }} produk yang stoknya hampir habis (< 10). Segera lakukan produksi ulang!</span>
+    </div>
+    @endif
+
     <div class="card-info-container">
         <div class="card-info">
             <h3>Total Varian Produk</h3>
@@ -20,6 +27,10 @@
         <div class="card-info border-danger">
             <h3>Stok Menipis (< 10)</h3>
             <div class="number text-danger">{{ $stokMenipis->count() }}</div>
+        </div>
+        <div class="card-info border-warning" style="border-left-color: #f39c12;">
+            <h3>Pesanan Pending</h3>
+            <div class="number text-warning" style="color: #f39c12;">{{ $pesananBaru }}</div>
         </div>
         <div class="card-info border-success">
             <h3>Total Penjualan Bulan Ini</h3>

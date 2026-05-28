@@ -14,7 +14,10 @@
 
 <div class="admin-layout">
     <div class="sidebar">
-        <h2><i class="fa-solid fa-shop"></i> Admin Panel</h2>
+        <div class="logo" style="text-align: center; padding-top: 10px;">
+            <img src="{{ asset('assets/img/footer-logo.png') }}" alt="Al-Fazza Bakery">
+        </div>
+        <h2 style="text-align: center; margin-top: 15px; margin-bottom: 25px; letter-spacing: 0.5px;">Admin Panel</h2>
         
         <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
             <i class="fa-solid fa-house"></i> Dashboard

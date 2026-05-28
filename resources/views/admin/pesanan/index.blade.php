@@ -147,16 +147,28 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 function confirmStatusChange(selectEl) {
     const label = selectEl.options[selectEl.selectedIndex].text;
-    const confirmed = confirm('Ubah status pesanan menjadi "' + label + '"?\n\nPastikan perubahan ini sudah benar sebelum melanjutkan.');
-    if (confirmed) {
-        selectEl.form.submit();
-    } else {
-        // Kembalikan ke nilai sebelumnya (sebelum user geser dropdown)
-        selectEl.value = selectEl.dataset.original ?? selectEl.value;
-    }
+    
+    Swal.fire({
+        title: 'Konfirmasi Perubahan',
+        text: 'Ubah status pesanan menjadi "' + label + '"?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#1976d2',
+        cancelButtonColor: '#888',
+        confirmButtonText: 'Ya, Ubah',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            selectEl.form.submit();
+        } else {
+            // Kembalikan ke nilai sebelumnya (sebelum user geser dropdown)
+            selectEl.value = selectEl.dataset.original ?? selectEl.value;
+        }
+    });
 }
 
 // Simpan nilai awal setiap dropdown agar bisa di-reset jika batal

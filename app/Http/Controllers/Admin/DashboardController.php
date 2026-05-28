@@ -16,6 +16,10 @@ class DashboardController extends Controller
         $totalProduk = Product::count();
         $stokMenipis = Product::where('stok', '<', 10)->get();
 
+        $pesananBaru = Transaction::where('order_status', 'baru')
+                                  ->where('payment_status', 'success')
+                                  ->count();
+
         // Fix #11: filter hanya transaksi sukses agar angka pendapatan akurat
         $penjualanBulanIni = Transaction::where('payment_status', 'success')
                                         ->whereMonth('created_at', Carbon::now()->month)
@@ -42,7 +46,7 @@ class DashboardController extends Controller
         }
 
         return view('admin.dashboard', compact(
-            'totalProduk', 'stokMenipis', 'penjualanBulanIni', 'labels', 'dataPendapatan'
+            'totalProduk', 'stokMenipis', 'pesananBaru', 'penjualanBulanIni', 'labels', 'dataPendapatan'
         ));
     }
 }

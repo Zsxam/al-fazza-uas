@@ -8,9 +8,14 @@
             <h1>Laporan Penjualan</h1>
             <p>Ringkasan semua transaksi sukses dan pendapatan toko.</p>
         </div>
-        <a href="{{ route('admin.laporan.pdf', request()->all()) }}" target="_blank" class="btn-tambah" style="background-color: #1a365d; color: white; text-decoration: none;">
-            <i class="fa-solid fa-file-pdf"></i> Cetak PDF
-        </a>
+        <div>
+            <a href="{{ route('admin.laporan.excel', request()->all()) }}" class="btn-tambah" style="background-color: #2e7d32; color: white; text-decoration: none; margin-right: 10px;">
+                <i class="fa-solid fa-file-excel"></i> Export CSV
+            </a>
+            <a href="{{ route('admin.laporan.pdf', request()->all()) }}" target="_blank" class="btn-tambah" style="background-color: #1a365d; color: white; text-decoration: none;">
+                <i class="fa-solid fa-file-pdf"></i> Cetak PDF
+            </a>
+        </div>
     </div>
 
     <div class="filter-container" style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">

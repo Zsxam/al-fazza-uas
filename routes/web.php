@@ -50,6 +50,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Laporan
     Route::get('/admin/laporan', [ReportController::class, 'laporanIndex'])->name('admin.laporan.index');
     Route::get('/admin/laporan/pdf', [ReportController::class, 'laporanPdf'])->name('admin.laporan.pdf');
+    Route::get('/admin/laporan/excel', [ReportController::class, 'laporanExcel'])->name('admin.laporan.excel');
 
     // Pesanan
     Route::get('/admin/pesanan', [OrderController::class, 'pesananIndex'])->name('admin.pesanan.index');

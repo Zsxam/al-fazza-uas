@@ -47,10 +47,10 @@
                     </td>
                     <td>
                         <a href="{{ route('admin.produk.edit', $p->id) }}" class="btn-action btn-edit" title="Edit"><i class="fa-solid fa-pen"></i></a>
-                        <form action="{{ route('admin.produk.destroy', $p->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus produk ' . $p->nama . '?');">
+                        <form id="delete-form-{{ $p->id }}" action="{{ route('admin.produk.destroy', $p->id) }}" method="POST" style="display:inline;">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn-action btn-delete" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+                            <button type="button" onclick="confirmDelete({{ $p->id }}, '{{ addslashes($p->nama) }}')" class="btn-action btn-delete" title="Hapus"><i class="fa-solid fa-trash"></i></button>
                         </form>
                     </td>
                 </tr>
@@ -59,3 +59,25 @@
         </table>
     </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function confirmDelete(id, name) {
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "Produk '" + name + "' akan dihapus permanen!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d32f2f',
+            cancelButtonColor: '#888',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('delete-form-' + id).submit();
+            }
+        })
+    }
+</script>
+@endpush

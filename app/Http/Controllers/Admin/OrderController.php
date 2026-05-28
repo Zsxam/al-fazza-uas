@@ -29,10 +29,21 @@ class OrderController extends Controller
 
     public function pesananUpdateStatus(UpdateOrderStatusRequest $request, $id)
     {
-        Transaction::findOrFail($id)->update([
+        $transaction = Transaction::findOrFail($id);
+        
+        $transaction->update([
             'order_status' => $request->order_status
         ]);
 
-        return redirect()->route('admin.pesanan.index')->with('success', 'Status pesanan diperbarui!');
+        if ($transaction->customer_email) {
+            try {
+                \Illuminate\Support\Facades\Mail::to($transaction->customer_email)->send(new \App\Mail\OrderStatusUpdated($transaction));
+            } catch (\Exception $e) {
+                // Biarkan lanjut jika gagal kirim email (misal tidak ada koneksi) agar tidak memblokir update status
+                \Illuminate\Support\Facades\Log::error('Gagal kirim email: ' . $e->getMessage());
+            }
+        }
+
+        return redirect()->route('admin.pesanan.index')->with('success', 'Status pesanan diperbarui & email telah dikirim (jika email pelanggan tersedia)!');
     }
 }
