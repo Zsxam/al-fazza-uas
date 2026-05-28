@@ -1,61 +1,61 @@
 @extends('layouts.main')
 
 @section('content')
-<div style="max-width: 500px; margin: 50px auto; padding: 20px;">
+<div class="max-w-lg my-12 mx-auto p-5">
     
-    <div style="background: white; border-radius: 15px; padding: 30px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 8px solid {{ $ui['color'] }};">
+    <div class="bg-white rounded-2xl p-8 text-center shadow-[0_4px_15px_rgba(0,0,0,0.1)]" style="border-top: 8px solid {{ $ui['color'] }};">
         
-        <div style="width: 80px; height: 80px; background: {{ $ui['bg_color'] }}; color: {{ $ui['color'] }}; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2.5rem;">
+        <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 text-4xl" style="background: {{ $ui['bg_color'] }}; color: {{ $ui['color'] }};">
             <i class="fa-solid {{ $ui['icon'] }}"></i>
         </div>
 
-        <h2 style="color: {{ $ui['color'] }}; margin-bottom: 5px;">{{ $ui['title'] }}</h2>
-        <p style="color: #666; font-size: 0.95rem; margin-bottom: 25px;">{{ $ui['message'] }}</p>
+        <h2 class="mb-1.5 font-bold text-2xl" style="color: {{ $ui['color'] }};">{{ $ui['title'] }}</h2>
+        <p class="text-text-muted text-base mb-6">{{ $ui['message'] }}</p>
 
-        <div style="background: #f8f9fa; border-radius: 10px; padding: 20px; text-align: left; margin-bottom: 25px; font-size: 0.9rem; line-height: 1.6;">
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #ddd; padding-bottom: 8px; margin-bottom: 8px;">
-                <span style="color: #888;">No. Invoice</span>
-                <strong style="color: #333;">{{ $transaksi->invoice_number }}</strong>
+        <div class="bg-bg-light rounded-xl p-5 text-left mb-6 text-sm leading-[1.6]">
+            <div class="flex justify-between border-b border-dashed border-border-medium pb-2 mb-2">
+                <span class="text-text-light">No. Invoice</span>
+                <strong class="text-text-dark">{{ $transaksi->invoice_number }}</strong>
             </div>
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #ddd; padding-bottom: 8px; margin-bottom: 8px;">
-                <span style="color: #888;">Metode Pembayaran</span>
-                <span style="font-weight: 500; text-transform: uppercase;">{{ $transaksi->payment_method ?? 'Midtrans' }}</span>
+            <div class="flex justify-between border-b border-dashed border-border-medium pb-2 mb-2">
+                <span class="text-text-light">Metode Pembayaran</span>
+                <span class="font-medium uppercase">{{ $transaksi->payment_method ?? 'Midtrans' }}</span>
             </div>
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #ddd; padding-bottom: 8px; margin-bottom: 8px;">
-                <span style="color: #888;">Status</span>
-                <span style="background: {{ $ui['bg_color'] }}; color: {{ $ui['color'] }}; padding: 2px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold;">{{ $ui['badge'] }}</span>
+            <div class="flex justify-between border-b border-dashed border-border-medium pb-2 mb-2">
+                <span class="text-text-light">Status</span>
+                <span class="py-0.5 px-2.5 rounded-3xl text-xs font-bold" style="background: {{ $ui['bg_color'] }}; color: {{ $ui['color'] }};">{{ $ui['badge'] }}</span>
             </div>
                         <!-- Tambahan Data Pelanggan -->
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #ddd; padding-bottom: 8px; margin-bottom: 8px; margin-top: 15px;">
-                <span style="color: #888;">Nama Pelanggan</span>
-                <strong style="color: #333; text-align: right;">{{ $transaksi->customer_name }}<br><small>{{ $transaksi->customer_phone }}</small></strong>
+            <div class="flex justify-between border-b border-dashed border-border-medium pb-2 mb-2 mt-4">
+                <span class="text-text-light">Nama Pelanggan</span>
+                <strong class="text-text-dark text-right">{{ $transaksi->customer_name }}<br><small class="font-normal">{{ $transaksi->customer_phone }}</small></strong>
             </div>
 
             @if($transaksi->order_type != 'kasir')
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #ddd; padding-bottom: 8px; margin-bottom: 8px;">
-                <span style="color: #888;">Alamat Pengiriman</span>
-                <span style="color: #333; text-align: right; max-width: 60%; font-size: 0.85rem;">{{ $transaksi->delivery_address ?? 'Ambil di Toko' }}</span>
+            <div class="flex justify-between border-b border-dashed border-border-medium pb-2 mb-2">
+                <span class="text-text-light">Alamat Pengiriman</span>
+                <span class="text-text-dark text-right max-w-[60%] text-sm">{{ $transaksi->delivery_address ?? 'Ambil di Toko' }}</span>
             </div>
             @endif
 
             @if($transaksi->order_type == 'custom-order')
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #ddd; padding-bottom: 8px; margin-bottom: 8px;">
-                <span style="color: #888;">Jenis Pesanan</span>
-                <span style="background: #9b59b6; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">Custom Cake</span>
+            <div class="flex justify-between border-b border-dashed border-border-medium pb-2 mb-2">
+                <span class="text-text-light">Jenis Pesanan</span>
+                <span class="bg-badge-purple text-white py-0.5 px-2 rounded text-xs font-bold">Custom Cake</span>
             </div>
             @elseif($transaksi->order_type == 'online')
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #ddd; padding-bottom: 8px; margin-bottom: 8px;">
-                <span style="color: #888;">Jenis Pesanan</span>
-                <span style="background: #3498db; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">Web (Online)</span>
+            <div class="flex justify-between border-b border-dashed border-border-medium pb-2 mb-2">
+                <span class="text-text-light">Jenis Pesanan</span>
+                <span class="bg-badge-blue text-white py-0.5 px-2 rounded text-xs font-bold">Web (Online)</span>
             </div>
             @endif
-            <div style="margin-bottom: 15px;">
-                <strong style="color: #333; display: block; margin-bottom: 10px;">Detail Pesanan:</strong>
+            <div class="mb-3.5">
+                <strong class="text-text-dark block mb-2.5">Detail Pesanan:</strong>
                 @foreach($transaksi->details as $detail)
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px;">
+                    <div class="flex justify-between items-center border-b border-border-light pb-2.5 mb-2.5">
                         <div>
-                            <span style="color: #333; font-weight: 500; display: block;">{{ $detail->product->nama }} (x{{ $detail->qty }})</span>
-                            <span style="color: #888; font-size: 0.85rem;">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</span>
+                            <span class="text-text-dark font-medium block">{{ $detail->product->nama }} (x{{ $detail->qty }})</span>
+                            <span class="text-text-light text-sm">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</span>
                         </div>
                         @if($transaksi->order_status == 'selesai')
                             @php
@@ -64,29 +64,29 @@
                                     ->exists();
                             @endphp
                             @if($hasReviewed)
-                                <span style="background: #e8f5e9; color: #388e3c; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold;"><i class="fa-solid fa-check"></i> Telah Dinilai</span>
+                                <span class="bg-success-bg text-text-success py-1 px-2.5 rounded-3xl text-xs font-bold"><i class="fa-solid fa-check"></i> Telah Dinilai</span>
                             @else
-                                <a href="{{ route('review.create', ['invoice' => $transaksi->invoice_number, 'product_id' => $detail->product_id]) }}" style="background: #a67c52; color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; text-decoration: none; display: inline-block;"><i class="fa-solid fa-star"></i> Beri Penilaian</a>
+                                <a href="{{ route('review.create', ['invoice' => $transaksi->invoice_number, 'product_id' => $detail->product_id]) }}" class="bg-primary-brown text-white py-1 px-2.5 rounded-3xl text-xs font-bold no-underline inline-block"><i class="fa-solid fa-star"></i> Beri Penilaian</a>
                             @endif
                         @endif
                     </div>
                 @endforeach
             </div>
 
-            <div style="display: flex; justify-content: space-between; margin-top: 15px; font-size: 1.1rem;">
+            <div class="flex justify-between mt-4 text-lg">
                 <strong>Total Bayar</strong>
-                <strong style="color: #a67c52;">Rp {{ number_format($transaksi->total_amount, 0, ',', '.') }}</strong>
+                <strong class="text-primary-brown">Rp {{ number_format($transaksi->total_amount, 0, ',', '.') }}</strong>
             </div>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div class="flex flex-col gap-2.5">
             @if($transaksi->payment_status == 'pending' && !empty($transaksi->snap_token))
-                <button type="button" onclick="bukaMidtransUlang('{{ $transaksi->snap_token }}')" style="background: #ef6c00; color: white; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 1rem; width: 100%; transition: 0.3s; margin-bottom: 5px;">
+                <button type="button" onclick="bukaMidtransUlang('{{ $transaksi->snap_token }}')" class="bg-warning text-white p-3 rounded-lg border-none font-bold cursor-pointer text-base w-full transition-all duration-300 mb-1.5 hover:bg-warning-hover">
                     <i class="fa-solid fa-wallet"></i> LANJUTKAN PEMBAYARAN
                 </button>
             @endif
 
-            <a href="/" style="background: #a67c52; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: 0.3s; text-align: center; display: block;">
+            <a href="/" class="bg-primary-brown text-white p-3 rounded-lg no-underline font-bold transition-all duration-300 text-center block hover:bg-dark-brown">
                 <i class="fa-solid fa-house"></i> Kembali ke Beranda
             </a>
         </div>

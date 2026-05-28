@@ -6,94 +6,95 @@
     <title>AL-Fazza Bakery</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/logo.png') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
+    {{-- <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}"> --}}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 </head>
 <body>
     <header>
-        <nav class="navbar">
-            <div class="nav-logo">
-                <div class="logo"><img src="{{ asset('assets/img/footer-logo.png') }}" alt=""></div>
-                <h2>AL - Fazza Bakery</h2>
+        <nav class="flex justify-between items-center py-1.5 px-[5%] bg-primary-brown text-white">
+            <div class="flex items-center gap-5">
+                <div class="h-20"><img src="{{ asset('assets/img/footer-logo.png') }}" class="h-full" alt=""></div>
+                <h2 class="m-0">AL - Fazza Bakery</h2>
             </div>
             <button class="hamburger" id="hamburger-btn" aria-label="Toggle menu">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
-            <div class="nav" id="main-nav">
-                <ul class="nav-links">
-                    <li><a href="{{ url('/') }}" class="active">Beranda</a></li>
-                    <li class="dropdown" id="categories-dropdown">
-                        <a href="#" class="dropbtn">Kategori</a>
-                        <ul class="dropdown-menu">
-                            <li><a href="{{ url('/kategori?jenis=bolu') }}">Aneka Bolu</a></li>
-                            <li><a href="{{ url('/kategori?jenis=pastry') }}">Pastry</a></li>
-                            <li><a href="{{ url('/kategori?jenis=cookies') }}">Cookies</a></li>
-                            <li><a href="{{ url('/kategori?jenis=roti') }}">Roti</a></li>
+            <div class="h-screen bg-dark-brown flex-col items-start pt-20 px-8 pb-10 z-[1050] transition-[right] duration-300 ease-in shadow-[-5px_0_20px_rgba(0,0,0,0.2)] md:static md:w-auto md:h-auto md:bg-transparent md:flex-row md:items-center md:gap-24 md:p-0 md:shadow-none flex [&.open]:right-0" id="main-nav">
+                <ul class="list-none flex flex-col md:flex-row w-full md:w-auto gap-0 md:gap-24">
+                    <li class="w-full md:w-auto border-b border-white/10 md:border-none"><a href="{{ url('/') }}" class="text-white block py-3.5 md:py-0 text-lg md:text-lg no-underline font-semibold active">Beranda</a></li>
+                    <li class="w-full md:w-auto border-b border-white/10 md:border-none relative inline-block group dropdown" id="categories-dropdown">
+                        <a href="#" class="text-white block py-3.5 md:py-0 text-lg md:text-lg no-underline font-semibold after:content-[''] after:absolute after:w-full after:h-[20px] after:-bottom-5 after:left-0">Kategori</a>
+                        <ul class="dropdown-menu static md:absolute top-full left-[-55%] text-left md:text-center bg-white/10 md:bg-white min-w-44 shadow-none md:shadow-[0_8px_16px_rgba(0,0,0,0.1)] rounded-none md:rounded-lg py-0 md:py-2.5 z-[1000] list-none mt-0 md:mt-4 max-h-0 md:max-h-none overflow-hidden transition-[max-height] duration-300 ease block md:hidden md:group-hover:block [&.open]:max-h-[300px] md:[&.open]:max-h-none">
+                            <li><a href="{{ url('/kategori?jenis=bolu') }}" class="text-white/80 md:text-text-dark py-2.5 px-5 block text-base md:text-base font-normal transition-all duration-300 ease-in-out hover:bg-white/10 md:hover:bg-primary-brown hover:text-white hover:pl-6">Aneka Bolu</a></li>
+                            <li><a href="{{ url('/kategori?jenis=pastry') }}" class="text-white/80 md:text-text-dark py-2.5 px-5 block text-base md:text-base font-normal transition-all duration-300 ease-in-out hover:bg-white/10 md:hover:bg-primary-brown hover:text-white hover:pl-6">Pastry</a></li>
+                            <li><a href="{{ url('/kategori?jenis=cookies') }}" class="text-white/80 md:text-text-dark py-2.5 px-5 block text-base md:text-base font-normal transition-all duration-300 ease-in-out hover:bg-white/10 md:hover:bg-primary-brown hover:text-white hover:pl-6">Cookies</a></li>
+                            <li><a href="{{ url('/kategori?jenis=roti') }}" class="text-white/80 md:text-text-dark py-2.5 px-5 block text-base md:text-base font-normal transition-all duration-300 ease-in-out hover:bg-white/10 md:hover:bg-primary-brown hover:text-white hover:pl-6">Roti</a></li>
                         </ul>
                     </li>
-                    <li><a href="{{ url('/about') }}">Tentang Kami</a></li>
+                    <li class="w-full md:w-auto border-b border-white/10 md:border-none"><a href="{{ url('/about') }}" class="text-white block py-3.5 md:py-0 text-lg md:text-lg no-underline font-semibold">Tentang Kami</a></li>
                 </ul>
-                <div class="cart-icon" id="cart-btn">
+                <div class="text-2xl relative cursor-pointer mt-6 md:mt-0" id="cart-btn">
                     <i class="fas fa-shopping-cart"></i>
-                    <span class="cart-count" id="cart-count">0</span>
+                    <span class="absolute -top-2.5 -right-2.5 bg-danger text-white text-xs py-0.5 px-1.5 rounded-full font-bold" id="cart-count">0</span>
                 </div>
             </div>
         </nav>
-        <div class="nav-overlay" id="nav-overlay"></div>
+        <div class="fixed inset-0 bg-black/50 z-[1040] opacity-0 invisible transition-all duration-300 ease [&.active]:opacity-100 [&.active]:visible" id="nav-overlay"></div>
 
-        <div class="cart-sidebar" id="cart-sidebar">
-            <div class="cart-header">
-                <h3>Keranjang</h3>
-                <button id="close-cart"><i class="fas fa-times"></i></button>
+        <div class="fixed top-0 -right-full w-96 h-screen bg-white shadow-[-5px_0_15px_rgba(0,0,0,0.1)] z-[1200] transition-[right] duration-400 ease-in-out flex flex-col [&.active]:right-0" id="cart-sidebar">
+            <div class="flex justify-between items-center p-5 border-b border-border-light">
+                <h3 class="m-0 text-lg font-bold">Keranjang</h3>
+                <button id="close-cart" class="bg-transparent border-none text-2xl cursor-pointer text-text-dark"><i class="fas fa-times"></i></button>
             </div>
             
-            <div class="cart-items">
+            <div class="cart-items grow p-5 overflow-y-auto">
             </div>
 
-            <div class="cart-footer">
-                <div class="cart-total">
+            <div class="p-5 border-t border-border-light bg-white">
+                <div class="flex justify-between mb-4 font-bold text-lg">
                     <span>Total :</span>
                     <span>Rp 0</span> 
                 </div>
-                <button class="btn-checkout">BELI SEKARANG</button>
+                <button class="btn-checkout w-full p-4 bg-primary-brown text-white border-none rounded cursor-pointer font-bold transition-colors duration-300 hover:bg-dark-brown">BELI SEKARANG</button>
             </div>
         </div>
 
-        <div class="cart-overlay" id="cart-overlay"></div>
+        <div class="fixed top-0 left-0 w-full h-full bg-black/50 z-[1150] invisible opacity-0 transition-all duration-400 ease [&.active]:visible [&.active]:opacity-100" id="cart-overlay"></div>
     </header>
 
     <main>
         @yield('content') 
     </main>
     
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-right">
-                <img src="{{ asset('assets/img/footer-logo.png') }}" alt="AL - Fazza Bakery Logo">
-                <div class="social-icons">
+    <footer class="bg-dark-brown text-white py-16 mt-12">
+        <div class="flex flex-col md:flex-row justify-center items-center gap-8 md:gap-[15%] text-center md:text-left px-5 md:px-0">
+            <div class="flex flex-col items-center">
+                <img src="{{ asset('assets/img/footer-logo.png') }}" alt="AL-Fazza Bakery Logo">
+                <div class="text-2xl mt-5 flex gap-4 justify-center">
                     <span><i class="fa-brands fa-instagram"></i></span> 
                     <span><i class="fa-brands fa-x-twitter"></i></span> 
                     <span><i class="fa-brands fa-facebook"></i></span> 
                     <span><i class="fa-brands fa-youtube"></i></span>
                 </div>
             </div>
-            <div class="footer-col">
-                <h4>Contact</h4>
-                <div class="footer-list">
-                    <div class="footer-icons">
-                        <p><i class="fa-brands fa-whatsapp"></i></p>
-                        <p><i class="fa-solid fa-envelope"></i></p>
-                        <p><i class="fa-solid fa-map-marker-alt"></i></p>
+            <div class="w-full max-w-sm md:max-w-none md:w-[400px]">
+                <h4 class="mb-5 font-bold">Contact</h4>
+                <div class="flex justify-center md:justify-start">
+                    <div class="pr-5 flex flex-col items-center md:items-start">
+                        <p class="text-base"><i class="fa-brands fa-whatsapp"></i></p>
+                        <p class="text-base"><i class="fa-solid fa-envelope"></i></p>
+                        <p class="text-base"><i class="fa-solid fa-map-marker-alt"></i></p>
                     </div>
-                    <div class="footer-contact">
-                        <p>+62 812 2131 5946</p>
-                        <p>info@alfazzabakery.com</p>
-                        <p>Jl. Edelweis III No.16 blok J2</p>
+                    <div class="flex flex-col text-left">
+                        <p class="text-base">+62 812 2131 5946</p>
+                        <p class="text-base">info@alfazzabakery.com</p>
+                        <p class="text-base">Jl. Edelweis III No.16 blok J2</p>
                     </div>
                 </div>
-                <div class="location-map">
+                <div class="mt-5 rounded-lg shadow-[0_4px_8px_rgba(0,0,0,0.1)] overflow-hidden">
                     <iframe 
                         src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d585.0202218415826!2d107.72891651234013!3d-6.948490799376005!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68c3cb151da7c1%3A0xa36f4d617456d7cc!2sAL-FAZZA!5e0!3m2!1sen!2sus!4v1775194929280!5m2!1sen!2sus" 
                         width="100%" 

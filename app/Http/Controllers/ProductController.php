@@ -31,9 +31,21 @@ class ProductController extends Controller
     }
 
     public function detail($id) {
-        // Cari produk berdasarkan ID
-        $kue = Product::findOrFail($id);
+        // Cari produk berdasarkan ID beserta ulasannya
+        $kue = Product::with(['reviews' => function($q) {
+            $q->orderBy('created_at', 'desc');
+        }, 'reviews.transaction'])->findOrFail($id);
+        
+        $totalReviews = $kue->reviews->count();
+        $ratingCounts = [
+            5 => $kue->reviews->where('rating', 5)->count(),
+            4 => $kue->reviews->where('rating', 4)->count(),
+            3 => $kue->reviews->where('rating', 3)->count(),
+            2 => $kue->reviews->where('rating', 2)->count(),
+            1 => $kue->reviews->where('rating', 1)->count(),
+        ];
+
         $rekomendasi = Product::where('id', '!=', $id)->inRandomOrder()->limit(4)->get();
-        return view('detail', compact('kue', 'rekomendasi'));
+        return view('detail', compact('kue', 'rekomendasi', 'totalReviews', 'ratingCounts'));
     }
 }
