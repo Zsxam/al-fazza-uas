@@ -3,76 +3,81 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\AdminController;
 use App\Http\Controllers\KasirController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\PaymentCallbackController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\InventoryController;
+use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\OrderController;
 
-// 1. Rute Dinamis (Mengambil data roti dari Database menggunakan Controller)
-// - Rute untuk halaman utama (Bisa diakses semua orang)
+// Rute Dinamis Halaman Utama
 Route::get('/', [ProductController::class, 'index']);
 Route::get('/kategori', [ProductController::class, 'kategori']);
 Route::get('/detail/{id}', [ProductController::class, 'detail']);
 
-// - RUTE GUEST (Hanya bisa diakses kalau belum login)
+// RUTE GUEST (Belum login)
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 });
     
-// - RUTE BACKEND (Hanya bisa diakses kalau sudah login)
-// 1. Rute Umum (Bisa diakses Admin & Kasir)
+// RUTE BACKEND UMUM
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
-// 2. Rute Khusus Admin
+// RUTE KHUSUS ADMIN
 Route::middleware(['auth', 'role:admin'])->group(function () {
-    // Rute halaman utama dashboard admin
-    Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    // Dashboard
+    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     
-    // Rute untuk mengelola produk
-    Route::get('/admin/produk', [AdminController::class, 'produkIndex'])->name('admin.produk.index'); // Tampil Tabel
-    Route::get('/admin/produk/tambah', [AdminController::class, 'produkCreate'])->name('admin.produk.create'); // Form Tambah
-    Route::post('/admin/produk', [AdminController::class, 'produkStore'])->name('admin.produk.store'); // Proses Simpan
-    Route::get('/admin/produk/{id}/edit', [AdminController::class, 'produkEdit'])->name('admin.produk.edit'); // Form Edit
-    Route::put('/admin/produk/{id}', [AdminController::class, 'produkUpdate'])->name('admin.produk.update'); // Proses Update
-    Route::delete('/admin/produk/{id}', [AdminController::class, 'produkDestroy'])->name('admin.produk.destroy'); // Proses Hapus
+    // Kelola Produk
+    Route::get('/admin/produk', [AdminProductController::class, 'produkIndex'])->name('admin.produk.index');
+    Route::get('/admin/produk/tambah', [AdminProductController::class, 'produkCreate'])->name('admin.produk.create');
+    Route::post('/admin/produk', [AdminProductController::class, 'produkStore'])->name('admin.produk.store');
+    Route::get('/admin/produk/{id}/edit', [AdminProductController::class, 'produkEdit'])->name('admin.produk.edit');
+    Route::put('/admin/produk/{id}', [AdminProductController::class, 'produkUpdate'])->name('admin.produk.update');
+    Route::delete('/admin/produk/{id}', [AdminProductController::class, 'produkDestroy'])->name('admin.produk.destroy');
 
-    // Rute untuk mengelola stok (Riwayat Stok & Catat Stok)
-    Route::get('/admin/stok', [AdminController::class, 'stokIndex'])->name('admin.stok.index'); // Tampil Riwayat
-    Route::get('/admin/stok/tambah', [AdminController::class, 'stokCreate'])->name('admin.stok.create'); // Form Catat Stok
-    Route::post('/admin/stok', [AdminController::class, 'stokStore'])->name('admin.stok.store'); // Proses Simpan & Update Stok
+    // Kelola Stok
+    Route::get('/admin/stok', [InventoryController::class, 'stokIndex'])->name('admin.stok.index');
+    Route::get('/admin/stok/tambah', [InventoryController::class, 'stokCreate'])->name('admin.stok.create');
+    Route::post('/admin/stok', [InventoryController::class, 'stokStore'])->name('admin.stok.store');
 
-    Route::get('/admin/laporan', [AdminController::class, 'laporanIndex'])->name('admin.laporan.index');
-    Route::get('/admin/laporan/pdf', [AdminController::class, 'laporanPdf'])->name('admin.laporan.pdf');
+    // Laporan
+    Route::get('/admin/laporan', [ReportController::class, 'laporanIndex'])->name('admin.laporan.index');
+    Route::get('/admin/laporan/pdf', [ReportController::class, 'laporanPdf'])->name('admin.laporan.pdf');
+    Route::get('/admin/laporan/excel', [ReportController::class, 'laporanExcel'])->name('admin.laporan.excel');
 
+    // Pesanan
+    Route::get('/admin/pesanan', [OrderController::class, 'pesananIndex'])->name('admin.pesanan.index');
+    Route::put('/admin/pesanan/{id}/status', [OrderController::class, 'pesananUpdateStatus'])->name('admin.pesanan.updateStatus');
 });
 
-// 3. Rute Khusus Kasir
+// RUTE KHUSUS KASIR
 Route::middleware(['auth', 'role:kasir'])->group(function () {
     Route::get('/kasir/pos', [KasirController::class, 'index'])->name('kasir.pos');
-    
     Route::post('/kasir/proses', [KasirController::class, 'prosesPos'])->name('kasir.proses');
-
     Route::get('/kasir/selesai/{id}', [KasirController::class, 'selesai'])->name('kasir.selesai');
+    Route::get('/kasir/cetak/{id}', [KasirController::class, 'cetakStruk'])->name('kasir.cetak');
 });
 
+// RUTE TRANSAKSI & STATIS
+Route::view('/about', 'about');
+Route::view('/checkout', 'checkout');
+Route::view('/custom-order', 'custom-order');
 
-// 2. Rute Statis (Hanya menampilkan view dasar, belum butuh data dari database)
-Route::get('/about', function () {
-    return view('about');
-});
-
-Route::get('/checkout', function () {
-    return view('checkout');
-});
-Route::post('/checkout/process', [TransactionController::class, 'processCheckout'])->name('checkout.process');
+Route::post('/checkout/process', [TransactionController::class, 'processCheckout'])->name('checkout.process')->middleware('throttle:5,1');
 Route::get('/checkout/invoice/{invoice}', [TransactionController::class, 'checkoutInvoice'])->name('checkout.invoice');
-Route::post('/midtrans/callback', [TransactionController::class, 'callback']);
-Route::post('/checkout/custom/process', [TransactionController::class, 'processCustomCheckout'])->name('checkout.custom.process');
-// Route::middleware(['auth'])->group(function () {
-// });
 
-Route::get('/custom-order', function () {
-    return view('custom-order');
-});
+// Review Routes
+Route::get('/review/{invoice}/{product_id}', [ReviewController::class, 'create'])->name('review.create');
+Route::post('/review/{invoice}/{product_id}', [ReviewController::class, 'store'])->name('review.store');
+
+Route::post('/checkout/custom/process', [TransactionController::class, 'processCustomCheckout'])->name('checkout.custom.process')->middleware('throttle:5,1');
+
+// Midtrans Webhook Callback
+Route::post('/midtrans/callback', [PaymentCallbackController::class, 'receive']);

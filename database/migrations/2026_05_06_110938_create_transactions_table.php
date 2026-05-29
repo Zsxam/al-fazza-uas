@@ -17,9 +17,15 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete(); // ID Kasir
             $table->string('customer_name');
             $table->string('customer_email')->nullable();
-            $table->enum('order_type', ['kasir', 'online']);
+            $table->string('customer_phone')->nullable();
+            $table->text('delivery_address')->nullable();
+            $table->date('delivery_date')->nullable();
+            $table->text('notes')->nullable();
+            $table->enum('order_type', ['kasir', 'online', 'custom-order']);
             $table->integer('total_amount');
             $table->enum('payment_status', ['pending', 'success', 'failed'])->default('pending');
+            $table->enum('order_status', ['baru', 'diproses', 'dikirim', 'selesai'])->default('baru');
+            $table->text('custom_details')->nullable();
             $table->string('snap_token')->nullable(); // Khusus Midtrans (Payment Gateway)
             $table->string('payment_method')->default('Cash');
             $table->integer('amount_paid')->nullable();
