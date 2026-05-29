@@ -75,10 +75,12 @@
 
         <div class="mt-[30px] flex gap-[15px]">
             <a href="{{ route('kasir.pos') }}" class="py-3 px-6 rounded-lg font-bold cursor-pointer no-underline inline-block border-none text-base bg-primary-brown text-white hover:bg-dark-brown transition">
-                <i class="fa-solid fa-cart-plus"></i> Transaksi Baru
+                <i class="fa-solid fa-cart-plus"></i> 
+                <span>Transaksi Baru</span>
             </a>
             <a href="{{ route('kasir.cetak', $transaksi->id) }}" target="_blank" class="py-3 px-6 rounded-lg font-bold cursor-pointer no-underline inline-block border-none text-base bg-btn-navy text-white hover:bg-btn-navy-hover transition">
-                <i class="fa-solid fa-print"></i> Cetak Struk
+                <i class="fa-solid fa-print"></i> 
+                <span>Cetak Struk</span>
             </a>
         </div>
 

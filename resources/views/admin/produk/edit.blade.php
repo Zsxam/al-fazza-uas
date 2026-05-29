@@ -3,8 +3,8 @@
 @section('title', 'Edit Produk')
 
 @section('content')
-    <div class="flex justify-between items-center mb-8">
-        <h1>Edit Produk</h1>
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <h1 class="text-xl lg:text-3xl font-bold m-0 mb-2">Edit Produk</h1>
         <p>Ubah detail roti atau kue yang sudah ada di sistem.</p>
     </div>
 

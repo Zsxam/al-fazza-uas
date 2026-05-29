@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="max-w-6xl mx-auto py-16 px-5">
-        <div class="flex flex-col md:flex-row items-center gap-10 mb-16">
+        <div class="flex flex-col-reverse md:flex-row items-center gap-10 mb-16">
             <div class="flex-1">
                 <h2 class="text-4xl font-bold text-dark-brown mb-5">Sejarah Al-Fazza Bakery</h2>
                 <p class="text-base text-text-medium leading-[1.7] mb-4 text-justify">Al-Fazza Bakery berawal dari kecintaan keluarga kami terhadap dunia *baking* dan komitmen untuk menyajikan hidangan berkualitas di meja makan. Berawal dari dapur rumah tangga yang sederhana, kami mulai memproduksi aneka roti dan kue dengan resep andalan keluarga.</p>

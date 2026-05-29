@@ -13,8 +13,9 @@
 </head>
 <body>
 
-<div class="flex min-h-screen font-sans">
-    <div class="w-64 bg-dark-brown text-white p-5 flex flex-col shrink-0">
+<div class="flex h-screen font-sans overflow-hidden relative">
+    <!-- Sidebar -->
+    <div id="admin-sidebar" class="w-64 bg-dark-brown text-white p-5 flex flex-col shrink-0 fixed inset-y-0 left-0 transform -translate-x-full lg:relative lg:translate-x-0 transition duration-200 ease-in-out z-50">
         <div class="text-center pt-2.5">
             <img src="{{ asset('assets/img/footer-logo.png') }}" alt="Al-Fazza Bakery" class="mx-auto max-w-full h-32 mb-2.5">
         </div>
@@ -44,11 +45,45 @@
         </form>
     </div>
 
-    <div class="flex-1 p-8 bg-bg-cream w-full overflow-y-auto">
-        @yield('content')
+    <div class="flex-1 flex flex-col min-w-0 bg-bg-cream">
+        <!-- Mobile Header -->
+        <div class="lg:hidden flex flex-row-reverse items-center justify-end p-4 bg-dark-brown text-white shadow-md z-40">
+            <h1 class="text-xl font-bold m-0 ml-4 tracking-wide">Admin Panel</h1>
+            <button id="mobile-menu-btn" class="text-white hover:text-gray-300 focus:outline-none">
+                <i class="fa-solid fa-bars text-2xl"></i>
+            </button>
+        </div>
+
+        <!-- Overlay -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden"></div>
+
+        <div class="flex-1 p-5 md:p-8 overflow-y-auto">
+            @yield('content')
+        </div>
     </div>
 </div>
 
 <script src="{{ asset('assets/js/script.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const btn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('admin-sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+
+        if(btn) {
+            btn.addEventListener('click', () => {
+                sidebar.classList.toggle('-translate-x-full');
+                overlay.classList.toggle('hidden');
+            });
+        }
+        
+        if(overlay) {
+            overlay.addEventListener('click', () => {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            });
+        }
+    });
+</script>
 </body>
 </html>

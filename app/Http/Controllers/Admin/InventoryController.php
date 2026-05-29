@@ -19,7 +19,7 @@ class InventoryController extends Controller
 
     public function stokIndex()
     {
-        $logs = InventoryLog::with('product')->orderBy('created_at', 'desc')->paginate(20);
+        $logs = InventoryLog::with('product')->orderBy('created_at', 'desc')->paginate(10);
         return view('admin.stok.index', compact('logs'));
     }
 

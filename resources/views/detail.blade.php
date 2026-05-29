@@ -2,22 +2,22 @@
 
 @section('content')
     <main class="max-w-6xl my-10 mx-auto px-5 font-sans">
-        <section class="flex flex-col md:flex-row gap-12 items-start mb-16">
-            <div class="flex-1 bg-bg-gray-light rounded-xl flex justify-center items-center overflow-hidden">
+        <section class="flex flex-col lg:flex-row gap-12 items-stretch lg:items-start mb-16">
+            <div class="flex-1 bg-bg-gray-light rounded-xl flex justify-center items-center overflow-hidden w-full">
                 <img id="product-img" src="{{ asset($kue->gambar) }}" alt="{{ $kue->nama }}" class="w-full max-h-125 object-cover rounded-xl">
             </div>
 
-            <div class="flex-1">
+            <div class="flex-1 w-full">
                 <div class="flex items-center gap-4 mb-1.5">
                     <h1 class="m-0 text-4xl text-black">{{ $kue->nama }}</h1>
                 </div>
-                <p class="text-text-muted mb-4 text-base">{{ $kue->nama }} - {{ $kue->tipe }}</p>
+                <p class="text-text-muted mb-4 text-bas e">{{ $kue->nama }} - {{ $kue->tipe }}</p>
                 <h2 class="text-3xl font-bold mb-6 text-black">Rp {{ number_format($kue->harga, 0, ',', '.') }}</h2>
 
-                <div class="flex gap-4 mb-8 items-center">
+                <div class="flex flex-col md:flex-row gap-4 mb-8 justify-between w-full lg:items-center">
                     <!-- Tombol beli mengambil QTY dari input -->
-                    <button class="bg-text-darker text-white py-3 px-10 border-none rounded-lg font-bold text-base cursor-pointer transition-colors duration-300 hover:bg-neutral-700" onclick="let qty = parseInt(document.getElementById('qty').value) || 1; addToCart('{{ $kue->id }}', '{{ $kue->nama }}', {{ $kue->harga }}, '{{ asset($kue->gambar) }}', qty)">Tambahkan ke Keranjang</button>
-                    <div class="flex items-center border border-border-dark rounded-lg overflow-hidden">
+                    <button class="bg-text-darker text-white py-3 md:px-[25%] lg:px-10 border-none rounded-lg font-bold text-base cursor-pointer transition-colors duration-300 hover:bg-neutral-700 w-full md:w-auto" onclick="let qty = parseInt(document.getElementById('qty').value) || 1; addToCart('{{ $kue->id }}', '{{ $kue->nama }}', {{ $kue->harga }}, '{{ asset($kue->gambar) }}', qty)">Tambahkan ke Keranjang</button>
+                    <div class="flex items-center border border-border-dark rounded-lg overflow-hidden w-full md:w-auto justify-center md:justify-start">
                         <button class="bg-white border-none py-3 px-4 cursor-pointer text-lg" onclick="changeQty(-1)">-</button>
                         <input type="number" id="qty" value="1" min="1" readonly class="w-10 h-12 text-center border-none text-lg outline-none pointer-events-none">
                         <button class="bg-white border-none py-3 px-4 cursor-pointer text-lg" onclick="changeQty(1)">+</button>
@@ -46,7 +46,7 @@
         </section>
 
         <section class="border-t border-border-medium pt-10 mt-10 font-sans">
-            <div class="flex flex-col md:flex-row gap-10 items-start">
+            <div class="flex flex-col lg:flex-row gap-10 items-stretch lg:items-start">
                 <div class="flex-1 text-center">
                     <h3 class="mb-2.5 text-xl text-black">Penilaian & Ulasan</h3>
                     <div class="flex justify-center items-baseline">
@@ -55,7 +55,7 @@
                     <p class="text-text-light mt-1.5">({{ $totalReviews }} Ulasan)</p>
                 </div>
         
-                <div class="flex-[1.5] flex flex-col gap-3 pt-11">
+                <div class="flex-[1.5] flex flex-col gap-3 lg:pt-11">
                     @for($i = 5; $i >= 1; $i--)
                         @php
                             $percentage = $totalReviews > 0 ? ($ratingCounts[$i] / $totalReviews) * 100 : 0;
@@ -68,7 +68,7 @@
                     @endfor
                 </div>
         
-                <div class="flex-2 w-full mt-5 md:mt-0">
+                <div class="flex-2 w-full mt-5 md:mt-0 px-2 lg:px-0">
                     <h3 class="font-bold text-xl text-black mb-4">Ulasan</h3>
                     
                     @forelse($kue->reviews as $review)
@@ -117,27 +117,27 @@
             </div>
         </section>
 
-        <hr class="border-0 border-t border-border-light my-5">
+        <hr class="border-0 border-t border-border-light my-5 hidden lg:block">
 
         <section class="recommendation">
             <h1 class="text-center py-10 font-bold text-3xl">Mungkin Anda Suka</h1>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mt-5" id="recommendation-grid">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5 mt-5" id="recommendation-grid">
                 @foreach($rekomendasi as $item)
-                    <div class="bg-white rounded-xl overflow-hidden shadow-[0_4px_10px_rgba(0,0,0,0.1)]">
-                        <div class="flex justify-between pt-5 px-8 pb-0">
-                            <div class="title-cat">
-                                <h3 class="text-xl text-text-darker mb-1 font-extrabold">{{ $item->nama }}</h3>
-                                <span class="text-base text-text-slate font-semibold">{{ $item->tipe }}</span>
+                    <div class="bg-white rounded-xl shadow-sm border border-border-cream flex flex-col h-full">
+                        <div class="flex justify-between pt-3 md:pt-5 px-3 md:px-8 pb-0">
+                            <div class="title-cat w-full">
+                                <h3 class="text-sm md:text-xl text-text-darker mb-1 font-extrabold truncate">{{ $item->nama }}</h3>
+                                <span class="text-xs md:text-base text-text-slate font-semibold">{{ $item->tipe }}</span>
                             </div>
                         </div>
-                        <div class="relative w-full mb-4">
-                            <div class="absolute top-2.5 left-10 bg-white/95 py-1.5 px-2.5 rounded text-sm font-extrabold text-text-dark flex items-center gap-1.5 shadow-[0_2px_5px_rgba(0,0,0,0.1)]"><i class="fa-solid fa-star text-star"></i>{{ $item->rating }}</div>
-                            <img src="{{ asset($item->gambar) }}" alt="{{ $item->nama }}" class="w-full h-48 rounded my-2.5 px-8 object-cover block">
+                        <div class="relative w-full mb-2 md:mb-4 flex-1">
+                            <div class="absolute top-3 left-3 md:left-9 bg-white/95 py-0.5 px-1.5 md:py-1.5 md:px-2.5 rounded text-xs md:text-sm font-extrabold text-text-dark flex items-center gap-1 shadow-[0_2px_5px_rgba(0,0,0,0.1)] z-10"><i class="fa-solid fa-star text-star"></i>{{ $item->rating }}</div>
+                            <img src="{{ asset($item->gambar) }}" alt="{{ $item->nama }}" class="w-full h-32 md:h-48 rounded px-2 md:px-8 object-cover block mt-2">
                         </div>
-                        <div class="flex justify-between items-center px-8 pb-5 flex-col gap-2">
-                            <p class="text-xl font-bold text-left w-full">Rp {{ number_format($item->harga, 0, ',', '.') }}</p>
-                            <div class="w-full">
-                                <a href="{{ url('/detail/' . $item->id) }}" class="bg-primary-brown text-white py-2.5 px-5 rounded font-bold cursor-pointer no-underline block text-center hover:bg-dark-brown w-full">Detail</a>
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center px-3 md:px-8 pb-3 md:pb-5 mt-auto gap-2">
+                            <p class="text-sm md:text-xl font-bold mb-0">Rp {{ number_format($item->harga, 0, ',', '.') }}</p>
+                            <div class="flex flex-row w-full md:w-auto">
+                                <a href="{{ url('/detail/' . $item->id) }}" class="flex-1 md:flex-none bg-primary-brown text-white border-none py-1.5 md:py-2.5 px-0 md:px-5 rounded font-bold cursor-pointer no-underline block text-center hover:bg-dark-brown text-xs md:text-base">Detail</a>
                             </div>
                         </div>
                     </div>

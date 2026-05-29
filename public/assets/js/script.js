@@ -55,6 +55,8 @@ document.addEventListener("DOMContentLoaded", () => {
         mainNav?.classList.remove('open');
         navOverlay?.classList.remove('active');
         document.body.style.overflow = '';
+        const ul = categoriesDropdown?.querySelector('.dropdown-menu');
+        if(ul) ul.classList.remove('open');
     }
 
     hamburger?.addEventListener('click', () => {
@@ -62,6 +64,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     navOverlay?.addEventListener('click', closeNav);
+
+    // C. Dropdown Menu Mobile
+    categoriesDropdown?.addEventListener('click', (e) => {
+        // Cek apakah hamburger sedang tampil (artinya sedang di mode mobile/tablet)
+        if(window.getComputedStyle(hamburger).display !== 'none') {
+            // Cek jika yang diklik adalah tulisan 'Kategori' (tag a)
+            if(e.target.tagName.toLowerCase() === 'a' && e.target.getAttribute('href') === '#') {
+                e.preventDefault();
+                const ul = categoriesDropdown.querySelector('.dropdown-menu');
+                if(ul) ul.classList.toggle('open');
+            }
+        }
+    });
 
     // C. Dropdown Kategori di Mobile
     categoriesDropdown?.querySelector('.dropbtn')?.addEventListener('click', (e) => {
@@ -164,8 +179,8 @@ function removeFromCart(index) {
 
 function updateCartUI() {
     const elCount = document.getElementById('cart-count');
-    const elItems = document.querySelector('.cart-items');
-    const elTotal = document.querySelector('.cart-total span:nth-child(2)');    
+    const elItems = document.querySelector('#cart-items');
+    const elTotal = document.querySelector('#cart-total');    
     
     if (elCount) elCount.textContent = cart.reduce((tot, item) => tot + item.quantity, 0);
 
@@ -497,6 +512,8 @@ function renderPosCart() {
     if (posCart.length === 0) {
         container.innerHTML = '<p style="text-align:center; color:#888; margin-top:50px;"><i class="fa-solid fa-basket-shopping" style="font-size:2rem; margin-bottom:10px;"></i><br>Belum ada pesanan.</p>';
         totalEl.textContent = 'Rp 0';
+        const fabCount = document.getElementById('fab-cart-count');
+        if(fabCount) fabCount.textContent = '0';
         return;
     }
 
@@ -522,6 +539,10 @@ function renderPosCart() {
 
     totalEl.textContent = 'Rp ' + grandTotal.toLocaleString('id-ID');
     posGrandTotal = grandTotal; 
+    
+    // Update FAB cart count
+    const fabCount = document.getElementById('fab-cart-count');
+    if(fabCount) fabCount.textContent = posCart.reduce((total, item) => total + item.qty, 0);
 }
 
 let posGrandTotal = 0;
@@ -538,12 +559,12 @@ function openModal() {
     document.getElementById('modal-change').value = 'Rp 0';
     toggleCashInput();
 
-    document.getElementById('payment-modal').classList.add('active');
+    document.getElementById('payment-modal').classList.add('flex');
     document.getElementById('payment-modal').classList.remove('hidden');
 }
 
 function closeModal() {
-    document.getElementById('payment-modal').classList.remove('active');
+    document.getElementById('payment-modal').classList.remove('flex');
     document.getElementById('payment-modal').classList.add('hidden');
 }
 

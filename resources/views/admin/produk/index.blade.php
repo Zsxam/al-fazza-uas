@@ -3,9 +3,9 @@
 @section('title', 'Daftar Produk')
 
 @section('content')
-    <div class="flex justify-between items-center mb-8">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-            <h1>Daftar Produk</h1>
+            <h1 class="text-xl lg:text-3xl font-bold m-0 mb-2">Daftar Produk</h1>
             <p>Kelola menu roti dan kue Al-Fazza Bakery.</p>
         </div>
         <a href="{{ route('admin.produk.create') }}" class="bg-success text-white py-2.5 px-5 rounded-md font-bold hover:bg-green-700 transition inline-block"><i class="fa-solid fa-plus"></i> Tambah Produk</a>
@@ -18,7 +18,7 @@
     @endif
 
     <div class="bg-white p-5 rounded-lg shadow-sm overflow-x-auto">
-        <table class="w-full border-collapse text-left [&_th]:bg-primary-brown [&_th]:text-white [&_th]:py-3 [&_th]:px-4 [&_td]:py-3 [&_td]:px-4 [&_td]:border-b [&_td]:border-border-light [&_td]:align-middle [&_tr:hover]:bg-gray-50">
+        <table class="w-full border-collapse text-left [&_th]:bg-primary-brown [&_th]:text-white [&_th]:py-3 [&_th]:px-4 [&_td]:py-3 [&_td]:px-4 [&_td]:border-b [&_td]:border-border-light [&_td]:align-middle [&_tr:hover]:bg-gray-50 text-xs lg:text-base whitespace-nowrap lg:whitespace-normal">
             <thead>
                 <tr class="hover:bg-gray-50">
                     <th class="bg-primary-brown text-white py-3 px-4">No</th>
@@ -57,6 +57,9 @@
                 @endforeach
             </tbody>
         </table>
+    </div>
+    <div class="mt-5">
+        {{ $products->links() }}
     </div>
 @endsection
 

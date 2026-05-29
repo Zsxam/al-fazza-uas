@@ -3,23 +3,23 @@
 @section('title', 'Laporan Keuangan')
 
 @section('content')
-    <div class="flex justify-between items-center mb-8">
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
         <div>
-            <h1>Laporan Penjualan</h1>
+            <h1 class="text-xl lg:text-3xl font-bold m-0 mb-2">Laporan Penjualan</h1>
             <p>Ringkasan semua transaksi sukses dan pendapatan toko.</p>
         </div>
-        <div>
-            <a href="{{ route('admin.laporan.excel', request()->all()) }}" class="bg-success text-white py-2.5 px-5 rounded-md font-bold hover:bg-green-600 transition inline-block mr-2.5 no-underline">
+        <div class="flex flex-col lg:flex-row w-full lg:w-auto gap-2">
+            <a href="{{ route('admin.laporan.excel', request()->all()) }}" class="w-full sm:w-auto whitespace-nowrap text-center bg-success text-white py-2 px-4 lg:py-2.5 lg:px-5 rounded-md font-bold hover:bg-green-600 transition inline-block no-underline text-sm lg:text-base">
                 <i class="fa-solid fa-file-excel"></i> Export CSV
             </a>
-            <a href="{{ route('admin.laporan.pdf', request()->all()) }}" target="_blank" class="bg-blue-900 text-white py-2.5 px-5 rounded-md font-bold hover:bg-blue-700 transition inline-block no-underline">
+            <a href="{{ route('admin.laporan.pdf', request()->all()) }}" target="_blank" class="w-full sm:w-auto whitespace-nowrap text-center bg-blue-900 text-white py-2 px-4 lg:py-2.5 lg:px-5 rounded-md font-bold hover:bg-blue-700 transition inline-block no-underline text-sm lg:text-base">
                 <i class="fa-solid fa-file-pdf"></i> Cetak PDF
             </a>
         </div>
     </div>
 
     <div class="bg-white p-5 rounded-lg mb-5 shadow-sm">
-        <form action="{{ route('admin.laporan.index') }}" method="GET" class="flex gap-4 items-end flex-wrap">
+        <form action="{{ route('admin.laporan.index') }}" method="GET" class="flex gap-4 items-end flex-wrap text-sm lg:text-base">
             
             <div class="flex-1 min-w-48">
                 <label>Cari Invoice:</label>
@@ -49,19 +49,19 @@
         </form>
     </div>
 
-    <div class="flex gap-5 mb-8">
+    <div class="flex flex-col lg:flex-row gap-3 lg:gap-5 mb-8">
         <div class="bg-white p-5 rounded-lg shadow-sm flex-1 border-l-[5px] border-l-success">
-            <h3>Total Pendapatan</h3>
-            <div class="text-3xl font-bold text-success">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</div>
+            <h3 class="text-base lg:text-xl font-bold m-0 mb-2">Total Pendapatan</h3>
+            <div class="text-2xl lg:text-3xl font-bold text-success">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</div>
         </div>
         <div class="bg-white p-5 rounded-lg shadow-sm flex-1 border-l-[5px] border-l-primary-brown">
-            <h3>Total Transaksi</h3>
-            <div class="text-3xl font-bold text-dark-brown">{{ $totalTransaksi }} Transaksi</div>
+            <h3 class="text-base lg:text-xl font-bold m-0 mb-2">Total Transaksi</h3>
+            <div class="text-2xl lg:text-3xl font-bold text-dark-brown">{{ $totalTransaksi }} Transaksi</div>
         </div>
     </div>
 
     <div class="bg-white p-5 rounded-lg shadow-sm overflow-x-auto">
-        <table class="w-full border-collapse text-left [&_th]:bg-primary-brown [&_th]:text-white [&_th]:py-3 [&_th]:px-4 [&_td]:py-3 [&_td]:px-4 [&_td]:border-b [&_td]:border-border-light [&_td]:align-middle [&_tr:hover]:bg-gray-50">
+        <table class="w-full border-collapse text-left [&_th]:bg-primary-brown [&_th]:text-white [&_th]:py-3 [&_th]:px-4 [&_td]:py-3 [&_td]:px-4 [&_td]:border-b [&_td]:border-border-light [&_td]:align-middle [&_tr:hover]:bg-gray-50 text-xs lg:text-base whitespace-nowrap lg:whitespace-normal">
             <thead>
                 <tr class="hover:bg-gray-50">
                     <th class="bg-primary-brown text-white py-3 px-4">Waktu</th>

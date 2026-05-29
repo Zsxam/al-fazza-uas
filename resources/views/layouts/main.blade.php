@@ -15,28 +15,28 @@
         <nav class="flex justify-between items-center py-1.5 px-[5%] bg-primary-brown text-white">
             <div class="flex items-center gap-5">
                 <div class="h-20"><img src="{{ asset('assets/img/footer-logo.png') }}" class="h-full" alt=""></div>
-                <h2 class="m-0">AL - Fazza Bakery</h2>
+                <h2 class="m-0 text-lg md:text-2xl">AL - Fazza Bakery</h2>
             </div>
-            <button class="hamburger" id="hamburger-btn" aria-label="Toggle menu">
-                <span></span>
-                <span></span>
-                <span></span>
+            <button class="hamburger lg:hidden flex flex-col gap-1.5 cursor-pointer bg-transparent border-none z-[1100]" id="hamburger-btn" aria-label="Toggle menu">
+                <span class="block w-6 h-[3px] bg-white transition-all duration-300"></span>
+                <span class="block w-6 h-[3px] bg-white transition-all duration-300"></span>
+                <span class="block w-6 h-[3px] bg-white transition-all duration-300"></span>
             </button>
-            <div class="h-screen bg-dark-brown flex-col items-start pt-20 px-8 pb-10 z-[1050] transition-[right] duration-300 ease-in shadow-[-5px_0_20px_rgba(0,0,0,0.2)] md:static md:w-auto md:h-auto md:bg-transparent md:flex-row md:items-center md:gap-24 md:p-0 md:shadow-none flex [&.open]:right-0" id="main-nav">
-                <ul class="list-none flex flex-col md:flex-row w-full md:w-auto gap-0 md:gap-24">
-                    <li class="w-full md:w-auto border-b border-white/10 md:border-none"><a href="{{ url('/') }}" class="text-white block py-3.5 md:py-0 text-lg md:text-lg no-underline font-semibold active">Beranda</a></li>
-                    <li class="w-full md:w-auto border-b border-white/10 md:border-none relative inline-block group dropdown" id="categories-dropdown">
-                        <a href="#" class="text-white block py-3.5 md:py-0 text-lg md:text-lg no-underline font-semibold after:content-[''] after:absolute after:w-full after:h-[20px] after:-bottom-5 after:left-0">Kategori</a>
-                        <ul class="dropdown-menu static md:absolute top-full left-[-55%] text-left md:text-center bg-white/10 md:bg-white min-w-44 shadow-none md:shadow-[0_8px_16px_rgba(0,0,0,0.1)] rounded-none md:rounded-lg py-0 md:py-2.5 z-[1000] list-none mt-0 md:mt-4 max-h-0 md:max-h-none overflow-hidden transition-[max-height] duration-300 ease block md:hidden md:group-hover:block [&.open]:max-h-[300px] md:[&.open]:max-h-none">
-                            <li><a href="{{ url('/kategori?jenis=bolu') }}" class="text-white/80 md:text-text-dark py-2.5 px-5 block text-base md:text-base font-normal transition-all duration-300 ease-in-out hover:bg-white/10 md:hover:bg-primary-brown hover:text-white hover:pl-6">Aneka Bolu</a></li>
-                            <li><a href="{{ url('/kategori?jenis=pastry') }}" class="text-white/80 md:text-text-dark py-2.5 px-5 block text-base md:text-base font-normal transition-all duration-300 ease-in-out hover:bg-white/10 md:hover:bg-primary-brown hover:text-white hover:pl-6">Pastry</a></li>
-                            <li><a href="{{ url('/kategori?jenis=cookies') }}" class="text-white/80 md:text-text-dark py-2.5 px-5 block text-base md:text-base font-normal transition-all duration-300 ease-in-out hover:bg-white/10 md:hover:bg-primary-brown hover:text-white hover:pl-6">Cookies</a></li>
-                            <li><a href="{{ url('/kategori?jenis=roti') }}" class="text-white/80 md:text-text-dark py-2.5 px-5 block text-base md:text-base font-normal transition-all duration-300 ease-in-out hover:bg-white/10 md:hover:bg-primary-brown hover:text-white hover:pl-6">Roti</a></li>
+            <div class="fixed top-0 -right-full w-64 h-screen bg-dark-brown flex-col items-start pt-20 px-8 pb-10 z-[1050] transition-all duration-300 ease-in-out shadow-[-5px_0_20px_rgba(0,0,0,0.2)] lg:static lg:w-auto lg:h-auto lg:bg-transparent lg:flex-row lg:items-center lg:gap-24 lg:p-0 lg:shadow-none flex [&.open]:right-0" id="main-nav">
+                <ul class="list-none flex flex-col lg:flex-row w-full lg:w-auto gap-0 lg:gap-24">
+                    <li class="w-full lg:w-auto border-b border-white/10 lg:border-none"><a href="{{ url('/') }}" class="text-white block py-3.5 lg:py-0 text-lg md:text-lg no-underline font-semibold active">Beranda</a></li>
+                    <li class="w-full lg:w-auto border-b border-white/10 lg:border-none relative inline-block group dropdown" id="categories-dropdown">
+                        <a href="#" class="text-white block py-3.5 lg:py-0 text-lg md:text-lg no-underline font-semibold after:content-[''] after:absolute after:w-full after:h-5 after:-bottom-5 after:left-0">Kategori</a>
+                        <ul class="dropdown-menu static lg:absolute top-full left-[-55%] text-left lg:text-center bg-white/10 lg:bg-white min-w-44 shadow-none lg:shadow-[0_8px_16px_rgba(0,0,0,0.1)] rounded-none lg:rounded-lg py-0 lg:py-2.5 z-[1000] list-none mt-0 lg:mt-4 max-h-0 lg:max-h-none overflow-hidden transition-[max-height] duration-300 ease block lg:hidden lg:group-hover:block [&.open]:max-h-[300px] lg:[&.open]:max-h-none">
+                            <li><a href="{{ url('/kategori?jenis=bolu') }}" class="text-white/80 lg:text-text-dark py-2.5 px-5 block text-base font-normal transition-all duration-300 ease-in-out hover:bg-white/10 lg:hover:bg-primary-brown hover:text-white hover:pl-6">Aneka Bolu</a></li>
+                            <li><a href="{{ url('/kategori?jenis=pastry') }}" class="text-white/80 lg:text-text-dark py-2.5 px-5 block text-base font-normal transition-all duration-300 ease-in-out hover:bg-white/10 lg:hover:bg-primary-brown hover:text-white hover:pl-6">Pastry</a></li>
+                            <li><a href="{{ url('/kategori?jenis=cookies') }}" class="text-white/80 lg:text-text-dark py-2.5 px-5 block text-base font-normal transition-all duration-300 ease-in-out hover:bg-white/10 lg:hover:bg-primary-brown hover:text-white hover:pl-6">Cookies</a></li>
+                            <li><a href="{{ url('/kategori?jenis=roti') }}" class="text-white/80 lg:text-text-dark py-2.5 px-5 block text-base font-normal transition-all duration-300 ease-in-out hover:bg-white/10 lg:hover:bg-primary-brown hover:text-white hover:pl-6">Roti</a></li>
                         </ul>
                     </li>
-                    <li class="w-full md:w-auto border-b border-white/10 md:border-none"><a href="{{ url('/about') }}" class="text-white block py-3.5 md:py-0 text-lg md:text-lg no-underline font-semibold">Tentang Kami</a></li>
+                    <li class="w-full lg:w-auto border-b border-white/10 lg:border-none"><a href="{{ url('/about') }}" class="text-white block py-3.5 lg:py-0 text-lg lg:text-lg no-underline font-semibold">Tentang Kami</a></li>
                 </ul>
-                <div class="text-2xl relative cursor-pointer mt-6 md:mt-0" id="cart-btn">
+                <div class="text-2xl relative cursor-pointer mt-6 lg:mt-0" id="cart-btn">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="absolute -top-2.5 -right-2.5 bg-danger text-white text-xs py-0.5 px-1.5 rounded-full font-bold" id="cart-count">0</span>
                 </div>
@@ -44,19 +44,19 @@
         </nav>
         <div class="fixed inset-0 bg-black/50 z-[1040] opacity-0 invisible transition-all duration-300 ease [&.active]:opacity-100 [&.active]:visible" id="nav-overlay"></div>
 
-        <div class="fixed top-0 -right-full w-96 h-screen bg-white shadow-[-5px_0_15px_rgba(0,0,0,0.1)] z-[1200] transition-[right] duration-400 ease-in-out flex flex-col [&.active]:right-0" id="cart-sidebar">
+        <div class="fixed top-0 -right-full w-full sm:w-96 h-screen bg-white shadow-[-5px_0_15px_rgba(0,0,0,0.1)] z-[1200] transition-[right] duration-400 ease-in-out flex flex-col [&.active]:right-0" id="cart-sidebar">
             <div class="flex justify-between items-center p-5 border-b border-border-light">
                 <h3 class="m-0 text-lg font-bold">Keranjang</h3>
                 <button id="close-cart" class="bg-transparent border-none text-2xl cursor-pointer text-text-dark"><i class="fas fa-times"></i></button>
             </div>
             
-            <div class="cart-items grow p-5 overflow-y-auto">
+            <div id="cart-items" class="grow p-5 overflow-y-auto">
             </div>
 
             <div class="p-5 border-t border-border-light bg-white">
                 <div class="flex justify-between mb-4 font-bold text-lg">
                     <span>Total :</span>
-                    <span>Rp 0</span> 
+                    <span id="cart-total">Rp 0</span> 
                 </div>
                 <button class="btn-checkout w-full p-4 bg-primary-brown text-white border-none rounded cursor-pointer font-bold transition-colors duration-300 hover:bg-dark-brown">BELI SEKARANG</button>
             </div>
@@ -70,7 +70,7 @@
     </main>
     
     <footer class="bg-dark-brown text-white py-16 mt-12">
-        <div class="flex flex-col md:flex-row justify-center items-center gap-8 md:gap-[15%] text-center md:text-left px-5 md:px-0">
+        <div class="flex flex-col md:flex-row justify-center items-center gap-8 lg:gap-[15%] text-center md:text-left px-5 lg:px-0">
             <div class="flex flex-col items-center">
                 <img src="{{ asset('assets/img/footer-logo.png') }}" alt="AL-Fazza Bakery Logo">
                 <div class="text-2xl mt-5 flex gap-4 justify-center">

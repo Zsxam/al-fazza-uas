@@ -3,8 +3,8 @@
 @section('title', 'Catat Stok Baru')
 
 @section('content')
-    <div class="flex justify-between items-center mb-8">
-        <h1>Catat Pergerakan Stok</h1>
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <h1 class="text-xl lg:text-3xl font-bold m-0 mb-2">Catat Pergerakan Stok</h1>
         <p>Catat stok roti baru matang (Masuk) atau roti rusak/kadaluarsa (Keluar).</p>
     </div>
 

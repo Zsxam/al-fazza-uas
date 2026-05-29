@@ -11,7 +11,7 @@
 </head>
 <body class="flex justify-center items-center min-h-screen bg-bg-cream m-0 font-sans">
 
-    <div class="bg-white w-full max-w-md py-10 px-8 rounded-xl shadow-[0_8px_20px_rgba(166,124,82,0.15)] border border-border-cream text-center">
+    <div class="bg-white w-full max-w-md mx-6 md:mx-auto py-10 px-8 rounded-xl shadow-[0_8px_20px_rgba(166,124,82,0.15)] border border-border-cream text-center">
         <div class="mb-8">
             <i class="fa-solid fa-shop text-5xl text-primary-brown mb-4"></i>
             <h2 class="text-dark-brown text-3xl mb-1.5 font-extrabold">Selamat Datang</h2>

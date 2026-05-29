@@ -3,16 +3,16 @@
 @section('title', 'Manajemen Pesanan')
 
 @section('content')
-    <div class="flex justify-between items-center mb-8">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-            <h1>Manajemen Pesanan</h1>
+            <h1 class="text-xl lg:text-3xl font-bold m-0 mb-2">Manajemen Pesanan</h1>
             <p>Kelola dan periksa detail pesanan pelanggan.</p>
         </div>
     </div>
 
     <!-- Filter Section -->
     <div class="bg-white p-5 rounded-lg mb-5">
-        <form action="{{ route('admin.pesanan.index') }}" method="GET" class="flex gap-4 items-end flex-wrap">
+        <form action="{{ route('admin.pesanan.index') }}" method="GET" class="flex gap-4 items-end flex-wrap text-sm lg:text-base">
             
             <div class="flex-1 min-w-40">
                 <label>Filter Status:</label>
@@ -43,7 +43,7 @@
     </div>
 
     <div class="bg-white p-5 rounded-lg shadow-sm overflow-x-auto">
-        <table class="w-full border-collapse text-left [&_th]:bg-primary-brown [&_th]:text-white [&_th]:py-3 [&_th]:px-4 [&_td]:py-3 [&_td]:px-4 [&_td]:border-b [&_td]:border-border-light [&_td]:align-middle [&_tr:hover]:bg-gray-50">
+        <table class="w-full border-collapse text-left [&_th]:bg-primary-brown [&_th]:text-white [&_th]:py-3 [&_th]:px-4 [&_td]:py-3 [&_td]:px-4 [&_td]:border-b [&_td]:border-border-light [&_td]:align-middle [&_tr:hover]:bg-gray-50 text-xs lg:text-base whitespace-nowrap lg:whitespace-normal">
             <thead>
                 <tr class="hover:bg-gray-50">
                     <th class="bg-primary-brown text-white py-3 px-4">Invoice & Waktu</th>

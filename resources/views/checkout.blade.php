@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
-    <div class="max-w-6xl my-10 mx-auto px-5 flex flex-col md:flex-row gap-8 items-start">
+    <div class="max-w-6xl my-10 mx-auto px-5 flex flex-col lg:flex-row gap-8 items-start">
         <div class="flex-2 bg-white p-8 rounded-lg shadow-[0_2px_10px_rgba(0,0,0,0.05)] w-full">
             <h2 class="text-primary-brown border-b-2 border-border-light pb-2.5 mb-5 mt-0 font-bold text-2xl">Informasi Pemesan</h2>
             <form id="checkoutForm" class="text-sm">
@@ -35,7 +35,7 @@
                     <textarea id="alamat" rows="4" required placeholder="Isi dengan detail tambahan seperti nomor rumah, blok, nama gedung, patokan, dll." class="form-input"></textarea>
                 </div>
 
-                <div class="flex items-center gap-2.5 bg-success-bg p-4 rounded text-success mt-5">
+                <div class="flex items-center gap-2.5 bg-green-100 p-4 rounded text-success mt-5">
                     <i class="fa-solid fa-shield-halved text-2xl"></i>
                     <p class="m-0 text-sm leading-normal">Pembayaran diproses secara aman dan otomatis melalui Midtrans. <strong>Invoice akan dikirimkan ke Email Anda.</strong></p>
                 </div>

@@ -106,6 +106,11 @@
                     <label class="block mb-1.5 font-medium text-sm">Alamat Pengiriman *</label>
                     <textarea id="co_alamat" rows="4" placeholder="Isi detail alamat seperti patokan, nomor rumah, RT/RW dll." class="form-input"></textarea>
                 </div>
+
+                <div class="flex items-center gap-2.5 bg-green-100 p-4 rounded text-success mt-5">
+                    <i class="fa-solid fa-shield-halved text-2xl"></i>
+                    <p class="m-0 text-sm leading-normal">Pembayaran diproses secara aman dan otomatis melalui Midtrans. <strong>Invoice akan dikirimkan ke Email Anda.</strong></p>
+                </div>
             </form>
         </div>
 

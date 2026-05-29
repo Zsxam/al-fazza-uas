@@ -16,7 +16,7 @@ class ReportController extends Controller
 
         $totalPendapatan = (clone $query)->sum('total_amount');
         $totalTransaksi  = (clone $query)->count();
-        $transaksi       = $query->orderBy('created_at', 'desc')->paginate(20)->withQueryString();
+        $transaksi       = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
 
         return view('admin.laporan.index', compact('transaksi', 'totalPendapatan', 'totalTransaksi'));
     }

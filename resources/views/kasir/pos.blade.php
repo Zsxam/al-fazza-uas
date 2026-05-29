@@ -12,17 +12,22 @@
 
     <header class="bg-dark-brown text-white py-4 px-5 flex justify-between items-center shadow-[0_2px_10px_rgba(0,0,0,0.1)] z-10">
         <h2 class="m-0"><i class="fa-solid fa-cash-register"></i> POS Al-Fazza</h2>
-        <div class="flex items-center gap-4">
+        <!-- Desktop Actions -->
+        <div class="hidden md:flex items-center gap-4">
             <span><i class="fa-solid fa-user-tie"></i> Kasir: <strong>{{ Auth::user()->name ?? 'Kasir Tamu' }}</strong></span>
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
                 <button type="submit" class="bg-danger text-white border-none py-2 px-4 rounded-[5px] cursor-pointer font-bold transition duration-300 hover:bg-text-danger-dark"><i class="fa-solid fa-power-off"></i> Keluar</button>
             </form>
         </div>
+        <!-- Mobile Actions -->
+        <button id="mobile-settings-btn" class="md:hidden text-white text-2xl focus:outline-none cursor-pointer">
+            <i class="fa-solid fa-gear"></i>
+        </button>
     </header>
 
-    <div class="flex flex-1 overflow-hidden">
-        <div class="flex-2 p-5 overflow-y-auto bg-bg-cream">
+    <div class="flex flex-1 overflow-hidden relative">
+        <div class="flex-[2] p-5 overflow-y-auto bg-bg-cream w-full">
             <input type="text" id="pos-search-input" class="w-full py-3 px-5 border border-border-medium rounded-lg text-base mb-5 outline-none transition duration-300 focus:border-primary-brown focus:ring-2 focus:ring-primary-brown/20" placeholder="Cari nama roti (Contoh: Cheese Cake)...">
             
             <div class="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-4">
@@ -39,10 +44,18 @@
             </div>
         </div>
 
-        <div class="flex-1 bg-white border-l border-border-light flex flex-col shadow-[-2px_0_10px_rgba(0,0,0,0.05)] z-5">
-            <div class="p-5 bg-bg-light border-b border-border-light text-center">
-                <h3>Pesanan Saat Ini</h3>
-                <p class="text-text-light text-sm">Kasir: {{ Auth::user()->name ?? 'Kasir Tamu' }}</p>
+        <!-- Mobile Overlay -->
+        <div id="pos-cart-overlay" class="fixed inset-0 bg-black/50 z-[1400] hidden md:hidden"></div>
+        
+        <div id="pos-cart-panel" class="fixed top-0 right-0 w-80 h-full transform translate-x-full md:relative md:translate-x-0 md:w-auto transition-transform z-[1500] bg-white border-l border-border-light flex flex-col shadow-[-2px_0_10px_rgba(0,0,0,0.05)] md:flex-1">
+            <div class="p-5 bg-bg-light border-b border-border-light flex justify-between md:justify-center items-center text-center">
+                <div>
+                    <h3 class="m-0">Pesanan Saat Ini</h3>
+                    <p class="text-text-light text-sm m-0">Kasir: {{ Auth::user()->name ?? 'Kasir Tamu' }}</p>
+                </div>
+                <button id="close-pos-cart" class="md:hidden bg-transparent border-none text-2xl cursor-pointer text-text-dark">
+                    <i class="fa-solid fa-times"></i>
+                </button>
             </div>
             
             <div class="flex-1 overflow-y-auto p-5" id="pos-cart-items">
@@ -69,8 +82,14 @@
         </div>
 
     </div>
-       <div id="payment-modal" class="hidden fixed inset-0 bg-black/60 z-2000 justify-center items-center">
-        <div class="bg-white p-6 rounded-[10px] w-full max-w-100 shadow-[0_10px_30px_rgba(0,0,0,0.2)]">
+
+    <!-- Floating Action Button for Mobile -->
+    <button id="fab-cart" class="fixed bottom-5 right-5 w-14 h-14 bg-primary-brown rounded-full flex items-center justify-center text-white md:hidden shadow-lg z-[1300] cursor-pointer border-none hover:bg-dark-brown">
+        <i class="fa-solid fa-shopping-cart text-xl"></i>
+        <span id="fab-cart-count" class="absolute -top-1 -right-1 bg-danger text-white text-xs py-0.5 px-1.5 rounded-full font-bold">0</span>
+    </button>
+       <div id="payment-modal" class="hidden fixed inset-0 bg-black/60 z-[2000] justify-center items-center">
+        <div class="bg-white p-6 rounded-[10px] w-[90%] max-w-lg shadow-[0_10px_30px_rgba(0,0,0,0.2)]">
             <h3 class="mb-4 border-b-2 border-border-light pb-2.5">Detail Pembayaran</h3>
             <div class="text-lg mb-5 flex justify-between">
                 <span>Total Tagihan:</span>
@@ -119,6 +138,59 @@
             </div>
         </div>
     </div>
+
+    <!-- Mobile Settings Overlay -->
+    <div id="settings-overlay" class="fixed inset-0 bg-black/50 z-[1400] hidden md:hidden"></div>
+    <div id="settings-panel" class="fixed top-0 right-0 w-64 h-full transform translate-x-full transition-transform z-[1500] bg-white flex flex-col shadow-[-2px_0_10px_rgba(0,0,0,0.05)] md:hidden">
+        <div class="p-5 bg-dark-brown text-white border-b border-border-light flex justify-between items-center">
+            
+            <button id="close-settings" class="bg-transparent border-none text-2xl cursor-pointer text-white">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>
+        <div class="p-5 flex flex-col gap-4">
+            <div class="text-text-dark border-b border-border-light pb-4">
+                <i class="fa-solid fa-user-tie text-primary-brown"></i> Kasir:<br>
+                <strong class="text-lg">{{ Auth::user()->name ?? 'Kasir Tamu' }}</strong>
+            </div>
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="w-full bg-danger text-white border-none py-3 px-4 rounded-[5px] cursor-pointer font-bold transition duration-300 hover:bg-text-danger-dark text-lg"><i class="fa-solid fa-power-off"></i> Keluar</button>
+            </form>
+        </div>
+    </div>
     <script src="{{ asset('assets/js/script.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fabCart = document.getElementById('fab-cart');
+            const closeCart = document.getElementById('close-pos-cart');
+            const cartPanel = document.getElementById('pos-cart-panel');
+            const overlay = document.getElementById('pos-cart-overlay');
+
+            function toggleCart() {
+                cartPanel.classList.toggle('translate-x-full');
+                overlay.classList.toggle('hidden');
+            }
+
+            if(fabCart) fabCart.addEventListener('click', toggleCart);
+            if(closeCart) closeCart.addEventListener('click', toggleCart);
+            if(overlay) overlay.addEventListener('click', toggleCart);
+
+            // Settings Menu Mobile Logic
+            const settingsBtn = document.getElementById('mobile-settings-btn');
+            const closeSettings = document.getElementById('close-settings');
+            const settingsPanel = document.getElementById('settings-panel');
+            const settingsOverlay = document.getElementById('settings-overlay');
+
+            function toggleSettings() {
+                settingsPanel.classList.toggle('translate-x-full');
+                settingsOverlay.classList.toggle('hidden');
+            }
+
+            if(settingsBtn) settingsBtn.addEventListener('click', toggleSettings);
+            if(closeSettings) closeSettings.addEventListener('click', toggleSettings);
+            if(settingsOverlay) settingsOverlay.addEventListener('click', toggleSettings);
+        });
+    </script>
 </body>
 </html>

@@ -3,8 +3,8 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    <div class="flex justify-between items-center mb-8">
-        <h1>Dashboard Ringkasan</h1>
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <h1 class="text-xl lg:text-3xl font-bold m-0 mb-2">Dashboard Ringkasan</h1>
         <p>Selamat datang, <strong>{{ Auth::user()->name }}</strong></p>
     </div>
 
@@ -15,28 +15,28 @@
     </div>
     @endif
 
-    <div class="flex gap-5 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 lg:gap-5 mb-8">
         <div class="bg-white p-5 rounded-lg shadow-sm flex-1 border-l-[5px] border-l-primary-brown">
-            <h3>Total Varian Produk</h3>
-            <div class="text-3xl font-bold text-dark-brown">{{ $totalProduk }}</div>
+            <h3 class="text-base lg:text-xl font-bold m-0 mb-2">Total Varian Produk</h3>
+            <div class="text-2xl lg:text-3xl font-bold text-dark-brown">{{ $totalProduk }}</div>
         </div>
         <div class="bg-white p-5 rounded-lg shadow-sm flex-1 border-l-[5px] border-l-danger">
-            <h3>Stok Menipis (< 10)</h3>
-            <div class="text-3xl font-bold text-danger">{{ $stokMenipis->count() }}</div>
+            <h3 class="text-base lg:text-xl font-bold m-0 mb-2">Stok Menipis (< 10)</h3>
+            <div class="text-2xl lg:text-3xl font-bold text-danger">{{ $stokMenipis->count() }}</div>
         </div>
         <div class="bg-white p-5 rounded-lg shadow-sm flex-1 border-l-[5px] border-l-warning">
-            <h3>Pesanan Pending</h3>
-            <div class="text-3xl font-bold text-warning">{{ $pesananBaru }}</div>
+            <h3 class="text-lg lg:text-xl font-bold m-0 mb-2">Pesanan Pending</h3>
+            <div class="text-xl lg:text-3xl font-bold text-warning">{{ $pesananBaru }}</div>
         </div>
         <div class="bg-white p-5 rounded-lg shadow-sm flex-1 border-l-[5px] border-l-success">
-            <h3>Total Penjualan Bulan Ini</h3>
-            <div class="text-3xl font-bold text-success">Rp {{ number_format($penjualanBulanIni, 0, ',', '.') }}</div>
+            <h3 class="text-lg lg:text-xl font-bold m-0 mb-2">Total Penjualan Bulan Ini</h3>
+            <div class="text-xl lg:text-3xl font-bold text-success">Rp {{ number_format($penjualanBulanIni, 0, ',', '.') }}</div>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-5">
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-5">
         <div class="bg-white p-5 rounded-lg shadow-sm">
-            <h3><i class="fa-solid fa-triangle-exclamation text-danger"></i> Stok Menipis</h3>
+            <h3 class="text-base lg:text-xl font-bold m-0 mb-2"><i class="fa-solid fa-triangle-exclamation text-danger"></i> Stok Menipis</h3>
             <hr class="border-0 border-t border-border-light my-4">
             @if($stokMenipis->count() > 0)
                 <ul class="stock-list">
@@ -53,7 +53,7 @@
         </div>
 
         <div class="bg-white p-5 rounded-lg shadow-sm">
-            <h3><i class="fa-solid fa-chart-line text-primary-brown"></i> Pendapatan 7 Hari Terakhir</h3>
+            <h3 class="text-base lg:text-xl font-bold m-0 mb-2"><i class="fa-solid fa-chart-line text-primary-brown"></i> Pendapatan 7 Hari Terakhir</h3>
             <hr class="border-0 border-t border-border-light my-4">
             <div class="relative h-[250px] w-full">
                 <canvas id="revenueChart"></canvas>
