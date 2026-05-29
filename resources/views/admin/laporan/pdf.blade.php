@@ -38,7 +38,7 @@
                 <td>
                     @if($t->order_type == 'kasir')
                         Kasir (Offline)
-                    @elseif($t->order_type == 'custom')
+                    @elseif($t->order_type == 'custom-order')
                         Custom Cake
                     @else
                         Web (Online)

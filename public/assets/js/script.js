@@ -55,6 +55,8 @@ document.addEventListener("DOMContentLoaded", () => {
         mainNav?.classList.remove('open');
         navOverlay?.classList.remove('active');
         document.body.style.overflow = '';
+        const ul = categoriesDropdown?.querySelector('.dropdown-menu');
+        if(ul) ul.classList.remove('open');
     }
 
     hamburger?.addEventListener('click', () => {
@@ -62,6 +64,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     navOverlay?.addEventListener('click', closeNav);
+
+    // C. Dropdown Menu Mobile
+    categoriesDropdown?.addEventListener('click', (e) => {
+        // Cek apakah hamburger sedang tampil (artinya sedang di mode mobile/tablet)
+        if(window.getComputedStyle(hamburger).display !== 'none') {
+            // Cek jika yang diklik adalah tulisan 'Kategori' (tag a)
+            if(e.target.tagName.toLowerCase() === 'a' && e.target.getAttribute('href') === '#') {
+                e.preventDefault();
+                const ul = categoriesDropdown.querySelector('.dropdown-menu');
+                if(ul) ul.classList.toggle('open');
+            }
+        }
+    });
 
     // C. Dropdown Kategori di Mobile
     categoriesDropdown?.querySelector('.dropbtn')?.addEventListener('click', (e) => {
@@ -148,10 +163,10 @@ function saveCart() {
     updateCartUI();
 }
 
-function addToCart(nama, harga, gambar, qty = 1) {
-    let item = cart.find(i => i.name === nama);
+function addToCart(id, nama, harga, gambar, qty = 1) {
+    let item = cart.find(i => i.id === id);
     if (item) item.quantity += qty;
-    else cart.push({ name: nama, price: harga, quantity: qty, image: gambar });
+    else cart.push({ id: id, name: nama, price: harga, quantity: qty, image: gambar });
     
     saveCart();
     alert(`${qty} ${nama} berhasil ditambahkan!`);
@@ -164,8 +179,8 @@ function removeFromCart(index) {
 
 function updateCartUI() {
     const elCount = document.getElementById('cart-count');
-    const elItems = document.querySelector('.cart-items');
-    const elTotal = document.querySelector('.cart-total span:nth-child(2)');    
+    const elItems = document.querySelector('#cart-items');
+    const elTotal = document.querySelector('#cart-total');    
     
     if (elCount) elCount.textContent = cart.reduce((tot, item) => tot + item.quantity, 0);
 
@@ -176,27 +191,26 @@ function updateCartUI() {
             grandTotal += sub;
     // GANTI MENJADI SEPERTI INI:
             return `
-                <div class="cart-item" style="display: flex; align-items: center; margin-bottom: 15px; position: relative;">
+                <div class="flex items-center mb-4 relative">
                     
-                    <a href="/produk/${item.id}" style="display: flex; text-decoration: none; color: inherit; align-items: center; gap: 15px; width: 60%;">
-                        <img src="${item.image}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
+                    <a href="/produk/${item.id}" class="flex items-center gap-4 w-[60%] no-underline text-inherit">
+                        <img src="${item.image}" alt="${item.name}" class="w-15 h-15 object-cover rounded-lg">
                         <div>
-                            <h4 style="margin: 0; font-size: 1rem;">${item.name}</h4>
-                            <p style="margin: 5px 0 0; color: #a67c52; font-weight: bold;">Rp ${item.price.toLocaleString('id-ID')}</p>
+                            <h4 class="m-0 text-base">${item.name}</h4>
+                            <p class="m-0 mt-1 text-primary-brown font-bold">Rp ${item.price.toLocaleString('id-ID')}</p>
                         </div>
                     </a>
 
-                    <div style="display: flex; align-items: center; gap: 10px; margin-left: auto; margin-right: 30px;">
-                        <button type="button" onclick="kurangiQty(${index})" style="width: 25px; height: 25px; border: 1px solid #ccc; background: white; border-radius: 4px; cursor: pointer; display: flex; justify-content: center; align-items: center;">-</button>
-                        <span style="font-weight: bold;">${item.quantity}</span>
-                        <button type="button" onclick="tambahQty(${index})" style="width: 25px; height: 25px; border: 1px solid #ccc; background: white; border-radius: 4px; cursor: pointer; display: flex; justify-content: center; align-items: center;">+</button>
+                    <div class="flex items-center gap-2.5 ml-auto mr-8">
+                        <button type="button" onclick="kurangiQty(${index})" class="w-6 h-6 border border-border-dark bg-white rounded cursor-pointer flex justify-center items-center hover:bg-gray-100">-</button>
+                        <span class="font-bold">${item.quantity}</span>
+                        <button type="button" onclick="tambahQty(${index})" class="w-6 h-6 border border-border-dark bg-white rounded cursor-pointer flex justify-center items-center hover:bg-gray-100">+</button>
                     </div>
 
-                    <button type="button" class="remove-item" onclick="removeFromCart(${index})" style="position: absolute; right: 0; background: transparent; border: none; color: #e74c3c; cursor: pointer; font-size: 1.1rem;">
+                    <button type="button" onclick="removeFromCart(${index})" class="absolute right-0 bg-transparent border-none text-danger cursor-pointer text-[1.1rem] hover:text-red-700">
                         <i class="fa fa-trash"></i>
                     </button>
                 </div>
-                <hr style="border: 0.5px solid #eee;">
             `;
         }).join('');
         if (elTotal) elTotal.textContent = `Rp ${grandTotal.toLocaleString('id-ID')}`;
@@ -235,20 +249,7 @@ function renderCheckoutSummary() {
     document.getElementById('checkout-grandtotal').textContent = `Rp ${grandTotal.toLocaleString('id-ID')}`;
 }
 
-function prosesCheckoutWA() {
-    const form = ['nama', 'nohp', 'alamat'].map(id => document.getElementById(id).value);
-    if (form.includes('')) return alert("Lengkapi Nama, No HP, dan Alamat!");
 
-    let wa = `Halo *AL-Fazza Bakery*, saya pesan:\n\n*PEMESAN*\nNama: ${form[0]}\nHP: ${form[1]}\nAlamat: ${form[2]}\n\n*PESANAN*\n`;
-    let total = 0;
-    
-    cart.forEach(i => {
-        let sub = i.price * i.quantity; total += sub;
-        wa += `- ${i.quantity}x ${i.name} (Rp ${sub.toLocaleString('id-ID')})\n`;
-    });
-    
-    window.open(`https://wa.me/6281221315946?t  ext=${encodeURIComponent(wa + `\n*Total: Rp ${total.toLocaleString('id-ID')}*`)}`);
-}
 
 // Fungsi untuk menambah Qty di keranjang
 function tambahQty(index) {
@@ -432,11 +433,12 @@ function prosesCustomOrderMidtrans() {
 
     fetch("/checkout/custom/process", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": csrfToken.getAttribute('content') },
+        headers: { "Content-Type": "application/json", "Accept": "application/json", "X-CSRF-TOKEN": csrfToken.getAttribute('content') },
         body: JSON.stringify({
             customer_name: nama,
             customer_email: email,
             customer_phone: nohp,
+            ukuran: ukuran,        // Dikirim ke server untuk kalkulasi harga server-side
             total_price: hargaCustomCake,
             delivery_address: alamat,
             custom_details: detailKue,
@@ -510,6 +512,8 @@ function renderPosCart() {
     if (posCart.length === 0) {
         container.innerHTML = '<p style="text-align:center; color:#888; margin-top:50px;"><i class="fa-solid fa-basket-shopping" style="font-size:2rem; margin-bottom:10px;"></i><br>Belum ada pesanan.</p>';
         totalEl.textContent = 'Rp 0';
+        const fabCount = document.getElementById('fab-cart-count');
+        if(fabCount) fabCount.textContent = '0';
         return;
     }
 
@@ -518,23 +522,27 @@ function renderPosCart() {
         grandTotal += subtotal;
 
         container.innerHTML += `
-            <div class="cart-item">
-                <div class="cart-item-info">
-                    <h4>${item.nama}</h4>
-                    <div class="cart-item-price">Rp ${item.harga.toLocaleString('id-ID')}</div>
+            <div class="flex justify-between items-center pb-4 mb-4 border-b border-dashed border-border-light">
+                <div>
+                    <h4 class="text-[0.95rem] text-text-dark m-0 mb-1">${item.nama}</h4>
+                    <div class="text-[0.85rem] text-text-light">Rp ${item.harga.toLocaleString('id-ID')}</div>
                 </div>
-                <div class="cart-item-qty">
-                    <button class="btn-qty" onclick="changePosQty(${item.id}, -1)">-</button>
-                    <span>${item.qty}</span>
-                    <button class="btn-qty" onclick="changePosQty(${item.id}, 1)">+</button>
+                <div class="flex items-center gap-3">
+                    <button class="bg-bg-light border-none w-6 h-6 rounded-full cursor-pointer font-bold hover:bg-border-medium transition" onclick="changePosQty(${item.id}, -1)">-</button>
+                    <span class="font-semibold">${item.qty}</span>
+                    <button class="bg-bg-light border-none w-6 h-6 rounded-full cursor-pointer font-bold hover:bg-border-medium transition" onclick="changePosQty(${item.id}, 1)">+</button>
                 </div>
-                <div style="font-weight: bold;">Rp ${subtotal.toLocaleString('id-ID')}</div>
+                <div class="font-bold">Rp ${subtotal.toLocaleString('id-ID')}</div>
             </div>
         `;
     });
 
     totalEl.textContent = 'Rp ' + grandTotal.toLocaleString('id-ID');
     posGrandTotal = grandTotal; 
+    
+    // Update FAB cart count
+    const fabCount = document.getElementById('fab-cart-count');
+    if(fabCount) fabCount.textContent = posCart.reduce((total, item) => total + item.qty, 0);
 }
 
 let posGrandTotal = 0;
@@ -551,11 +559,13 @@ function openModal() {
     document.getElementById('modal-change').value = 'Rp 0';
     toggleCashInput();
 
-    document.getElementById('payment-modal').classList.add('active');
+    document.getElementById('payment-modal').classList.add('flex');
+    document.getElementById('payment-modal').classList.remove('hidden');
 }
 
 function closeModal() {
-    document.getElementById('payment-modal').classList.remove('active');
+    document.getElementById('payment-modal').classList.remove('flex');
+    document.getElementById('payment-modal').classList.add('hidden');
 }
 
 function toggleCashInput() {
@@ -723,7 +733,7 @@ function payNow() {
 
     fetch("/checkout/process", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": csrfToken.getAttribute('content') },
+        headers: { "Content-Type": "application/json", "Accept": "application/json", "X-CSRF-TOKEN": csrfToken.getAttribute('content') },
         body: JSON.stringify({
             total_price: grandTotal, 
             items: cart,

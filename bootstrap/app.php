@@ -22,6 +22,11 @@ return Application::configure(basePath: dirname(__DIR__))
             '/midtrans/callback',
         ]);
         
+        // 3. Arahkan user yang sudah login sesuai jabatannya jika mencoba buka /login
+        $middleware->redirectUsersTo(function () {
+            return auth()->user()->role === 'admin' ? '/admin/dashboard' : '/kasir/pos';
+        });
+        
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
