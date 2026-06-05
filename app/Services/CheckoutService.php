@@ -244,7 +244,7 @@ class CheckoutService
                     if ($fraud == 'challenge') {
                         $transaksi->update(['payment_status' => 'pending']);
                     } else {
-                        $transaksi->update(['payment_status' => 'success', 'payment_method' => $type, 'amount_paid' => $notif->gross_amount]);
+                        $transaksi->update(['payment_status' => 'success', 'payment_method' => $type, 'amount_paid' => (int) $notif->gross_amount]);
                         // Kurangi stok setelah pembayaran kartu kredit dikonfirmasi sukses
                         if ($transaksi->order_type == 'online') {
                             $this->kurangiStokOnline($transaksi, $order_id);
@@ -252,7 +252,7 @@ class CheckoutService
                     }
                 }
             } else if ($transaction == 'settlement') {
-                $transaksi->update(['payment_status' => 'success', 'payment_method' => $type, 'amount_paid' => $notif->gross_amount]);
+                $transaksi->update(['payment_status' => 'success', 'payment_method' => $type, 'amount_paid' => (int) $notif->gross_amount]);
                 // Kurangi stok setelah pembayaran online dikonfirmasi settlement (sukses)
                 if ($transaksi->order_type == 'online') {
                     $this->kurangiStokOnline($transaksi, $order_id);
