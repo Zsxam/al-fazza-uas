@@ -283,6 +283,7 @@ class CheckoutService
             return true;
         } catch (Exception $e) {
             DB::rollBack();
+            \Illuminate\Support\Facades\Log::error('Gaib Error di Callback: ' . $e->getMessage() . ' di baris ' . $e->getLine());
             return false;
         }
     }
