@@ -65,7 +65,7 @@
             <tbody>
                 @foreach($products as $index => $p)
                 <tr class="hover:bg-gray-50">
-                    <td class="py-3 px-4 border-b border-border-light align-middle">{{ $index + 1 }}</td>
+                    <td class="py-3 px-4 border-b border-border-light align-middle">{{ $products->firstItem() + $index }}</td>
                     <td class="py-3 px-4 border-b border-border-light align-middle"><img loading="lazy" src="{{ asset($p->gambar) }}" alt="{{ $p->nama }}" class="w-16 h-16 object-cover rounded border border-border-medium"></td>
                     <td class="py-3 px-4 border-b border-border-light align-middle"><strong>{{ $p->nama }}</strong><br><small class="text-text-light">{{ $p->tipe }}</small></td>
                     <td class="py-3 px-4 border-b border-border-light align-middle">{{ ucfirst($p->kategori) }}</td>

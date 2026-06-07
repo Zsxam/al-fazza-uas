@@ -79,7 +79,7 @@
                     </td>
                     
                     <!-- Kolom 2: Info Pengiriman -->
-                    <td class="align-top max-w-64 py-3 px-4 border-b border-border-light align-middle">
+                    <td class="align-top min-w-[200px] whitespace-normal break-words py-3 px-4 border-b border-border-light align-middle">
                         <strong>{{ $p->customer_name }}</strong><br>
                         <i class="fa-solid fa-phone"></i> {{ $p->customer_phone ?? '-' }}<br>
                         <hr class="my-1 border-t border-border-light">
@@ -92,7 +92,7 @@
                     </td>
                     
                     <!-- Kolom 3: Detail Produk -->
-                    <td class="align-top max-w-64 py-3 px-4 border-b border-border-light align-middle">
+                    <td class="align-top min-w-[250px] whitespace-normal break-words py-3 px-4 border-b border-border-light align-middle">
                         @if($p->order_type == 'custom-order')
                             <!-- Tampilkan Detail Custom Cake -->
                             <div class="text-sm text-text-dark bg-gray-50 p-2 rounded-md">
