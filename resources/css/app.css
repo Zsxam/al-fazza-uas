@@ -9,7 +9,7 @@
 
 @theme {
     /* Brand Colors */
-    --color-primary-brown: #a67c52;
+    --color-primary-brown: #BDA28F;
     --color-secondary: #997777;
     --color-dark-brown: #4a3b32;
     --color-bg-cream: #fdfaf6;
@@ -76,16 +76,16 @@
 
 @layer components {
     .btn-primary {
-        @apply bg-primary-brown text-white border-none rounded-[5px] cursor-pointer transition-colors duration-300 hover:bg-dark-brown inline-flex items-center justify-center;
+        @apply bg-primary-brown text-white border-none rounded-lg-lg cursor-pointer transition-colors duration-300 hover:opacity-90 inline-flex items-center justify-center;
     }
     .btn-secondary {
-        @apply bg-secondary text-white border-none rounded-[5px] cursor-pointer transition-colors duration-300 hover:bg-dark-brown inline-flex items-center justify-center;
+        @apply bg-secondary text-white border-none rounded-lg-lg cursor-pointer transition-colors duration-300 hover:opacity-90 inline-flex items-center justify-center;
     }
     .form-input {
-        @apply w-full p-2.5 border border-border-medium rounded-[5px] outline-none focus:border-primary-brown;
+        @apply w-full p-2.5 border border-border-medium rounded-lg-lg outline-none focus:border-primary-brown;
     }
     .badge {
-        @apply py-0.5 px-2 rounded-sm text-[0.8rem] font-bold inline-block;
+        @apply py-0.5 px-2 rounded-lg text-[0.8rem] font-bold inline-block;
     }
 }
 
@@ -97,4 +97,85 @@
 /* Fix SweetAlert z-index overlapping with cart sidebar */
 .swal2-container {
     z-index: 9999 !important;
+}
+
+/* Custom SweetAlert Styling for Figma Design */
+div:where(.swal2-container) div:where(.swal2-popup) {
+    background-color: #F6F0EA !important; /* Cream background matching Figma */
+    border-radius: 16px !important; 
+    color: var(--color-dark-brown) !important;
+    padding: 3rem 2rem 2rem 2rem !important;
+    width: 28em !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+}
+
+div:where(.swal2-container) h2:where(.swal2-title) {
+    color: var(--color-dark-brown) !important;
+    font-size: 1.5rem !important;
+    font-weight: 800 !important;
+    margin-top: 1.5rem !important;
+    padding: 0 !important;
+}
+
+div:where(.swal2-container) div:where(.swal2-html-container) {
+    color: var(--color-dark-brown) !important;
+    font-size: 1rem !important;
+    margin-top: 0.5rem !important;
+    margin-bottom: 2rem !important;
+}
+
+/* Force action buttons container to stack vertically and take full width */
+div:where(.swal2-container) div:where(.swal2-actions) {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+    width: 100% !important;
+    margin-top: 0 !important;
+}
+
+div:where(.swal2-container) button:where(.swal2-styled) {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0.875rem 1.5rem !important;
+    border-radius: 0.5rem !important; /* rounded-lg-lg */
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+div:where(.swal2-container) button:where(.swal2-confirm) {
+    background-color: var(--color-primary-brown) !important;
+    color: white !important;
+}
+
+div:where(.swal2-container) button:where(.swal2-cancel) {
+    background-color: var(--color-dark-brown) !important;
+    color: white !important;
+}
+
+/* Specific styling for warning/info icons to match the Figma circle */
+div:where(.swal2-container) div:where(.swal2-icon) {
+    border: none !important;
+    background-color: #EFE2D4 !important;
+    border-radius: 50% !important;
+    width: 80px !important;
+    height: 80px !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+div:where(.swal2-icon).swal2-warning, 
+div:where(.swal2-icon).swal2-question, 
+div:where(.swal2-icon).swal2-error,
+div:where(.swal2-icon).swal2-success,
+div:where(.swal2-icon).swal2-info {
+    color: var(--color-dark-brown) !important;
+}
+div:where(.swal2-icon) .swal2-icon-content {
+    font-size: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
