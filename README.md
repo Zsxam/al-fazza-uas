@@ -125,4 +125,4 @@ Aplikasi sekarang dapat diakses melalui browser di alamat: `http://127.0.0.1:800
 Untuk masuk ke **Dashboard Admin**, Anda bisa cari mandiri di *Seeder*
 
 ---
-*Dibuat dengan ❤️ untuk Ujian Akhir Semester Pemrograman Web UPI.*
+*Dibuat dengan ❤️ oleh PancongMan untuk Ujian Akhir Semester Pemrograman Web RPL UPI.*
