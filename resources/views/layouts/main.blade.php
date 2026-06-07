@@ -21,9 +21,9 @@
             
             <div class="fixed top-0 -right-full w-64 h-screen bg-dark-brown flex-col items-start pt-20 px-8 lg:px-0 pb-10 z-[1050] transition-all duration-300 ease-in-out shadow-[-5px_0_20px_rgba(0,0,0,0.2)] lg:static lg:w-auto lg:h-auto lg:bg-transparent lg:flex-row lg:items-center lg:p-0 lg:shadow-none flex [&.open]:right-0" id="main-nav">
                 <ul class="list-none flex flex-col lg:flex-row w-full lg:w-auto gap-0 lg:gap-12">
-                    <li class="w-full lg:w-auto border-b border-white/10 lg:border-none"><a href="{{ url('/') }}" class="text-white block py-3.5 lg:py-0 text-lg md:text-lg no-underline font-semibold active">Beranda</a></li>
+                    <li class="w-full lg:w-auto border-b border-white/10 lg:border-none"><a href="{{ url('/') }}" class="block py-3.5 lg:py-0 text-lg md:text-lg no-underline font-semibold transition-all duration-300 {{ request()->is('/') ? 'lg:text-dark-brown underline underline-offset' : 'text-white hover:text-dark-brown' }}">Beranda</a></li>
                     <li class="w-full lg:w-auto border-b border-white/10 lg:border-none relative inline-block group dropdown" id="categories-dropdown">
-                        <a href="#" class="text-white block py-3.5 lg:py-0 text-lg md:text-lg no-underline font-semibold after:content-[''] after:absolute after:w-full after:h-5 after:-bottom-5 after:left-0">Kategori</a>
+                        <a href="#" class="block py-3.5 lg:py-0 text-lg md:text-lg no-underline font-semibold after:content-[''] after:absolute after:w-full after:h-5 after:-bottom-5 after:left-0 transition-all duration-300 {{ request()->is('kategori') ? 'lg:text-dark-brown underline underline-offset-8' : 'text-white hover:text-dark-brown' }}">Kategori</a>
                         <ul class="dropdown-menu static lg:absolute top-full left-[-55%] text-left lg:text-center bg-white/10 lg:bg-white min-w-44 shadow-none lg:shadow-[0_8px_16px_rgba(0,0,0,0.1)] rounded-none lg:rounded-lg py-0 lg:py-2.5 z-[1000] list-none mt-0 lg:mt-4 max-h-0 lg:max-h-none overflow-hidden transition-[max-height] duration-300 ease block lg:hidden lg:group-hover:block [&.open]:max-h-[300px] lg:[&.open]:max-h-none">
                             <li><a href="{{ url('/kategori?jenis=bolu') }}" class="text-white/80 lg:text-text-dark py-2.5 px-5 block text-base font-normal transition-all duration-300 ease-in-out hover:bg-white/10 lg:hover:bg-primary-brown hover:text-white hover:pl-6">Aneka Bolu</a></li>
                             <li><a href="{{ url('/kategori?jenis=pastry') }}" class="text-white/80 lg:text-text-dark py-2.5 px-5 block text-base font-normal transition-all duration-300 ease-in-out hover:bg-white/10 lg:hover:bg-primary-brown hover:text-white hover:pl-6">Pastry</a></li>
@@ -31,8 +31,8 @@
                             <li><a href="{{ url('/kategori?jenis=roti') }}" class="text-white/80 lg:text-text-dark py-2.5 px-5 block text-base font-normal transition-all duration-300 ease-in-out hover:bg-white/10 lg:hover:bg-primary-brown hover:text-white hover:pl-6">Roti</a></li>
                         </ul>
                     </li>
-                    <li class="w-full lg:w-auto border-b border-white/10 lg:border-none"><a href="{{ url('/custom-order') }}" class="text-white block py-3.5 lg:py-0 text-lg lg:text-lg no-underline font-semibold">Custom Cake</a></li>
-                    <li class="w-full lg:w-auto border-b border-white/10 lg:border-none"><a href="{{ url('/about') }}" class="text-white block py-3.5 lg:py-0 text-lg lg:text-lg no-underline font-semibold">Tentang Kami</a></li>
+                    <li class="w-full lg:w-auto border-b border-white/10 lg:border-none"><a href="{{ url('/custom-order') }}" class="block py-3.5 lg:py-0 text-lg lg:text-lg no-underline font-semibold transition-all duration-300 {{ request()->is('custom-order') ? 'lg:text-dark-brown underline underline-offset-8' : 'text-white hover:text-dark-brown' }}">Custom Cake</a></li>
+                    <li class="w-full lg:w-auto border-b border-white/10 lg:border-none"><a href="{{ url('/about') }}" class="block py-3.5 lg:py-0 text-lg lg:text-lg no-underline font-semibold transition-all duration-300 {{ request()->is('about') ? 'lg:text-dark-brown underline underline-offset-8' : 'text-white hover:text-dark-brown' }}">Tentang Kami</a></li>
                 </ul>
             </div>
             
@@ -64,7 +64,7 @@
                     <span>Total :</span>
                     <span id="cart-total">Rp 0</span> 
                 </div>
-                <button class="btn-checkout w-full p-4 bg-primary-brown text-white border-none rounded cursor-pointer font-bold transition-colors duration-300 hover:bg-dark-brown">BELI SEKARANG</button>
+                <button class="btn-checkout w-full p-4 bg-primary-brown text-white border-none rounded-lg cursor-pointer font-bold transition-colors duration-300 hover:bg-dark-brown">BELI SEKARANG</button>
             </div>
         </div>
 
@@ -79,6 +79,12 @@
         <div class="flex flex-col md:flex-row justify-center items-center gap-8 lg:gap-[15%] text-center md:text-left px-5 lg:px-0">
             <div class="flex flex-col items-center">
                 <img id="easter-logo" loading="lazy" src="{{ asset('assets/img/footer-logo.png') }}" alt="AL-Fazza Bakery Logo">
+                <div class="text-2xl mt-5 flex gap-4 justify-center md:justify-start hidden md:block">
+                    <span><i class="fa-brands fa-instagram"></i></span> 
+                    <span><i class="fa-brands fa-x-twitter"></i></span> 
+                    <span><i class="fa-brands fa-facebook"></i></span> 
+                    <span><i class="fa-brands fa-youtube"></i></span>
+                </div>
             </div>
             <div class="w-full max-w-sm md:max-w-none md:w-[400px]">
                 <h4 class="mb-5 font-bold">Contact</h4>
@@ -105,7 +111,7 @@
                         referrerpolicy="no-referrer-when-downgrade">
                     </iframe>
                 </div>
-                <div class="text-2xl mt-5 flex gap-4 justify-center md:justify-start">
+                <div class="text-2xl mt-5 flex gap-4 justify-center md:justify-start block md:hidden">
                     <span><i class="fa-brands fa-instagram"></i></span> 
                     <span><i class="fa-brands fa-x-twitter"></i></span> 
                     <span><i class="fa-brands fa-facebook"></i></span> 

@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="max-w-6xl my-10 mx-auto px-5 flex flex-col lg:flex-row gap-8 items-start">
-        <div class="flex-2 bg-white p-8 rounded-lg-lg shadow-[0_2px_10px_rgba(0,0,0,0.05)] w-full">
+        <div class="flex-2 bg-white p-8 rounded-lg shadow-[0_2px_10px_rgba(0,0,0,0.05)] w-full">
             <h2 class="text-primary-brown border-b-2 border-border-light pb-2.5 mb-5 mt-0 font-bold text-2xl">Informasi Pemesan</h2>
             <form id="checkoutForm" class="text-sm">
                 
@@ -49,7 +49,7 @@
         </div>
 
         <div class="flex-1 sticky top-5 w-full">
-            <div class="bg-white rounded-lg-lg overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.05)] mb-5">
+            <div class="bg-white rounded-lg overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.05)] mb-5">
                 <div class="bg-primary-brown text-white p-4">
                     <h3 class="m-0 text-lg font-bold">Ringkasan Pesanan</h3>
                 </div>
@@ -69,14 +69,14 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg-lg overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.05)] mb-5">
+            <div class="bg-white rounded-lg overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.05)] mb-5">
                 <div class="bg-primary-brown text-white p-4">
                     <h3 class="m-0 text-lg font-bold">Catatan</h3>
                 </div>
                 <textarea id="catatan" rows="3" placeholder="Tulis catatan pesanan (Opsional)" class="w-full border-none p-5 resize-none outline-none font-inherit"></textarea>
             </div>
 
-            <button type="button" class="w-full bg-btn-navy text-white p-4 border-none rounded-lg-lg text-lg font-bold cursor-pointer transition-colors duration-300 hover:bg-btn-navy-hover flex justify-center items-center gap-2.5 shadow-[0_4px_6px_rgba(0,0,0,0.1)] mt-5" onclick="payNow()">
+            <button type="button" class="w-full bg-btn-navy text-white p-4 border-none rounded-lg text-lg font-bold cursor-pointer transition-colors duration-300 hover:bg-btn-navy-hover flex justify-center items-center gap-2.5 shadow-[0_4px_6px_rgba(0,0,0,0.1)] mt-5" onclick="payNow()">
                 <i class="fa-solid fa-credit-card"></i> PESAN & BAYAR SEKARANG
             </button>
         </div>

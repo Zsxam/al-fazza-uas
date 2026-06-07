@@ -5,12 +5,12 @@
         <div class="flex-2 w-full">
             <!-- Mobile Only: Cara Pesan & Petunjuk Harga -->
             <div class="block md:hidden">
-                <div class="bg-white rounded-lg-lg overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.05)] mb-5">
+                <div class="bg-white rounded-lg overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.05)] mb-5">
                     <div class="bg-primary-brown text-white p-4">
                         <h3 class="m-0 text-lg font-bold">Cara Pesan Custom Cake</h3>
                     </div>
                     
-                    <div class="p-3.5 rounded-lg-lg">
+                    <div class="p-3.5 rounded-lg">
                         <ol class="leading-[1.8] text-text-medium pl-4 m-0">
                             <li>Isi formulir spesifikasi <em>Custom Cake</em> Anda dengan lengkap.</li>
                             <li><strong>Total harga</strong> otomatis terhitung berdasarkan <strong>Ukuran Kue</strong>.</li>
@@ -19,12 +19,12 @@
                         </ol>
                     </div>
                 </div>
-                <div class="bg-white rounded-lg-lg overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.05)] mb-8">
+                <div class="bg-white rounded-lg overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.05)] mb-8">
                     <div class="bg-primary-brown text-white p-4">
                         <h3 class="m-0 text-lg font-bold">Petunjuk Harga Custom Cake</h3>
                     </div>
                     
-                    <div class="p-3.5 rounded-lg-lg">                    
+                    <div class="p-3.5 rounded-lg">                    
                         <ul class="list-none p-0 m-0 text-text-dark text-base">
                             <li class="flex justify-between py-2 border-b border-dashed border-border-dark">
                                 <span>Ukuran 16 cm</span> <strong>Rp 150.000</strong>
@@ -49,7 +49,7 @@
                 </div>
             </div>
 
-            <div class="bg-white p-8 rounded-lg-lg shadow-[0_2px_10px_rgba(0,0,0,0.05)] w-full">
+            <div class="bg-white p-8 rounded-lg shadow-[0_2px_10px_rgba(0,0,0,0.05)] w-full">
                 <h2 class="text-primary-brown border-b-2 border-border-light pb-2.5 mb-5 mt-0 font-bold text-2xl">Informasi Pemesan</h2>
                 <form id="customOrderForm" class="text-sm">
                     
@@ -170,12 +170,12 @@
         <div class="flex-1 sticky top-5 w-full">
             <!-- Desktop Only: Cara Pesan & Petunjuk Harga -->
             <div class="hidden md:block">
-                <div class="bg-white rounded-lg-lg overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.05)] mb-5">
+                <div class="bg-white rounded-lg overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.05)] mb-5">
                     <div class="bg-primary-brown text-white p-4">
                         <h3 class="m-0 text-lg font-bold">Cara Pesan Custom Cake</h3>
                     </div>
                     
-                    <div class="p-3.5 rounded-lg-lg">
+                    <div class="p-3.5 rounded-lg">
                         <ol class="leading-[1.8] text-text-medium pl-4 m-0">
                             <li>Isi formulir spesifikasi <em>Custom Cake</em> Anda dengan lengkap.</li>
                             <li><strong>Total harga</strong> otomatis terhitung berdasarkan <strong>Ukuran Kue</strong>.</li>
@@ -184,12 +184,12 @@
                         </ol>
                     </div>
                 </div>
-                <div class="bg-white rounded-lg-lg overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.05)] mb-5">
+                <div class="bg-white rounded-lg overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.05)] mb-5">
                     <div class="bg-primary-brown text-white p-4">
                         <h3 class="m-0 text-lg font-bold">Petunjuk Harga Custom Cake</h3>
                     </div>
                     
-                    <div class="p-3.5 rounded-lg-lg">                    
+                    <div class="p-3.5 rounded-lg">                    
                         <ul class="list-none p-0 m-0 text-text-dark text-base">
                             <li class="flex justify-between py-2 border-b border-dashed border-border-dark">
                                 <span>Ukuran 16 cm</span> <strong>Rp 150.000</strong>
@@ -214,14 +214,14 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg-lg overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.05)] mb-5 mt-5 md:mt-0">
+            <div class="bg-white rounded-lg overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.05)] mb-5 mt-5 md:mt-0">
                 <div class="bg-primary-brown text-white p-4">
                     <h3 class="m-0 text-lg font-bold">Catatan Tambahan</h3>
                 </div>
-                <textarea id="co_catatan" rows="3" placeholder="Contoh: Krim jangan terlalu manis, dll." class="w-full p-2.5 border border-border-dark rounded-lg font-inherit outline-none focus:border-primary-brown"></textarea>
+                <textarea id="co_catatan" rows="3" placeholder="Contoh: Krim jangan terlalu manis, dll." class="w-full p-2.5 rounded-lg font-inherit outline-none focus:border-primary-brown"></textarea>
             </div>
 
-            <button type="button" onclick="prosesCustomOrderMidtrans()" class="w-full bg-btn-navy text-white p-4 border-none rounded-lg-lg text-lg font-bold cursor-pointer transition-colors duration-300 hover:bg-btn-navy-hover flex justify-center items-center gap-2.5 shadow-[0_4px_6px_rgba(0,0,0,0.1)] mt-5">
+            <button type="button" onclick="prosesCustomOrderMidtrans()" class="w-full bg-btn-navy text-white p-4 border-none rounded-lg text-lg font-bold cursor-pointer transition-colors duration-300 hover:bg-btn-navy-hover flex justify-center items-center gap-2.5 shadow-[0_4px_6px_rgba(0,0,0,0.1)] mt-5">
                 <i class="fa-solid fa-credit-card"></i> PESAN & BAYAR SEKARANG
             </button>   
         </div>

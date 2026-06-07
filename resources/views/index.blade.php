@@ -69,7 +69,7 @@
         <h2 class="text-center my-10 font-extrabold text-2xl md:text-3xl flex justify-center items-center gap-3 text-black">
             <span class="bg-[#FF4A8D] text-white text-xs md:text-sm px-2.5 py-1 rounded-md font-black tracking-wide">NEW</span> Bakery Terbaru
         </h2>
-        <div class="bg-primary-brown grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5 p-3 md:p-5 lg:mx-[13%] mx-[5%] my-5 rounded">
+        <div class="bg-primary-brown grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5 p-3 md:p-5 lg:mx-[13%] mx-[5%] my-5 rounded-lg">
             @foreach($products as $p)
                 <div class="bg-white rounded-xl shadow-sm flex flex-col h-full">
                     <div class="flex justify-between pt-3 md:pt-5 px-3 md:px-8 pb-0">
@@ -97,7 +97,7 @@
     <h2 class="text-center my-10 font-extrabold text-2xl md:text-3xl text-black">Wujudkan Kue Impianmu!</h2>
     <section class="bg-cover bg-center lg:mx-[13%] mx-[5%] mb-16 rounded-xl text-center py-12 md:py-16 px-6 md:px-10 text-white shadow-[0_10px_30px_rgba(0,0,0,0.2)] relative overflow-hidden" style="background-image: linear-gradient(rgba(30, 20, 15, 0.75), rgba(30, 20, 15, 0.75)), url('{{ asset('assets/img/hero-bg.png') }}');">
         <!-- Inner Border for custom order banner -->
-        <div class="absolute inset-2 border-2 border-[#D8C4A9]/40 rounded-lg pointer-events-none"></div>
+        <div class="absolute inset-2 border-2 border-dashed border-[#D8C4A9]/40 rounded-lg pointer-events-none"></div>
         <div class="custom-cake-content relative z-10">
             <h3 class="text-xl md:text-3xl mb-4 font-extrabold tracking-wide flex justify-center items-center gap-3">
                 Rancang Kue Sendiri
