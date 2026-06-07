@@ -183,14 +183,14 @@ function addToCart(id, nama, harga, gambar, qty = 1) {
 function removeFromCart(index) {
     // Jika qty 1 dan ditekan minus, tanyakan apakah mau dihapus
     Swal.fire({
-        title: 'Hapus Produk?',
-        text: "Keluarkan produk ini dari keranjang belanja?",
-        icon: 'warning',
+        title: 'Yakin ingin menghapus pesanan?',
+        html: 'pesanan yang kamu hapus masih dapat ditambahkan di menu kok',
+        iconHtml: '<i class="fa-solid fa-trash-can" style="color: var(--color-dark-brown);"></i>',
         showCancelButton: true,
         confirmButtonColor: '#d33',
         cancelButtonColor: '#a67c52',
-        confirmButtonText: 'Hapus',
-        cancelButtonText: 'Batal'
+        confirmButtonText: 'Hapus Sekarang',
+        cancelButtonText: 'Batalkan'
     }).then((result) => {
         if (result.isConfirmed) {
             cart.splice(index, 1);
@@ -424,14 +424,14 @@ function prosesCustomOrderMidtrans() {
 
     // === TAMBAHAN GERBANG KONFIRMASI ===
     Swal.fire({
-        title: 'Konfirmasi Pesanan',
-        text: "Apakah spesifikasi kue, alamat pengiriman, dan data diri Anda sudah sesuai?",
-        icon: 'question',
+        title: 'Konfirmasi Pesanan?',
+        text: "Sebelum lakukan pesanan pastikan data diri dan spesifikasi sudah sesuai ya",
+        iconHtml: '<i class="fa-solid fa-cart-shopping" style="color: var(--color-dark-brown);"></i>',
         showCancelButton: true,
         confirmButtonColor: '#a67c52',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Ya, Proses Tagihan!',
-        cancelButtonText: 'Batal'
+        confirmButtonText: 'Ya. saya yakin',
+        cancelButtonText: 'Kembali'
     }).then((result) => {
         if (result.isConfirmed) {
             showLoader();
@@ -801,14 +801,14 @@ function payNow() {
 
     // === TAMBAHAN GERBANG KONFIRMASI ===
     Swal.fire({
-        title: 'Konfirmasi Checkout',
-        text: "Apakah daftar belanjaan dan alamat pengiriman Anda sudah sesuai?",
-        icon: 'question',
+        title: 'Konfirmasi Checkout?',
+        text: "Sebelum lakukan checkout pastikan pesanan kamu sudah sesuai ya",
+        iconHtml: '<i class="fa-solid fa-cart-shopping" style="color: var(--color-dark-brown);"></i>',
         showCancelButton: true,
         confirmButtonColor: '#a67c52',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Ya, Bayar Sekarang!',
-        cancelButtonText: 'Batal'
+        confirmButtonText: 'Ya. saya yakin',
+        cancelButtonText: 'Kembali'
     }).then((result) => {
         if (result.isConfirmed) {
             showLoader();
