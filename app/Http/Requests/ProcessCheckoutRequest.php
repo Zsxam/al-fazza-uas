@@ -19,10 +19,10 @@ class ProcessCheckoutRequest extends FormRequest
             'items.*.quantity' => 'required|integer|min:1',
             'customer_name' => 'required|string|max:255',
             'customer_email' => 'required|email|max:255',
-            'customer_phone' => 'required|string|max:20',
+            'customer_phone' => ['required', 'string', 'regex:/^[0-9]{10,13}$/'],
             'delivery_date' => 'required|date',
-            'delivery_address' => 'required|string',
-            'notes' => 'nullable|string',
+            'delivery_address' => 'required|string|max:300',
+            'notes' => 'nullable|string|max:200',
         ];
     }
 
@@ -37,8 +37,11 @@ class ProcessCheckoutRequest extends FormRequest
             'customer_email.required' => 'Email wajib diisi.',
             'customer_email.email' => 'Format email tidak valid.',
             'customer_phone.required' => 'Nomor WhatsApp wajib diisi.',
+            'customer_phone.regex' => 'Nomor HP hanya boleh berisi angka (10–13 digit).',
             'delivery_date.required' => 'Tanggal pengiriman wajib diisi.',
             'delivery_address.required' => 'Alamat pengiriman wajib diisi.',
+            'delivery_address.max' => 'Detail alamat maksimal 300 karakter.',
+            'notes.max' => 'Catatan maksimal 200 karakter.',
         ];
     }
 }

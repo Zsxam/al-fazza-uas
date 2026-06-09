@@ -2,6 +2,18 @@
 let cart = JSON.parse(localStorage.getItem('alfazza_cart')) || [];
 let posCart = [];
 
+// Helper: Update character counter pada textarea
+function updateCharCount(fieldId, maxLength) {
+    const field = document.getElementById(fieldId);
+    const counter = document.getElementById(fieldId + '-count');
+    if (!field || !counter) return;
+    const len = field.value.length;
+    counter.textContent = len;
+    // Ubah warna jadi merah jika mendekati batas (>90%)
+    counter.style.color = len >= maxLength * 0.9 ? '#ef4444' : '';
+}
+
+
 document.addEventListener("DOMContentLoaded", () => {
     // === TAMBAHAN KUNCI TANGGAL ===
     // Sesuaikan ID-nya. Kalau untuk Custom Order: 'co_tanggal'. 
@@ -163,10 +175,30 @@ function saveCart() {
     updateCartUI();
 }
 
-function addToCart(id, nama, harga, gambar, qty = 1) {
+function addToCart(id, nama, harga, gambar, qty = 1, stok = 9999) {
     let item = cart.find(i => i.id === id);
-    if (item) item.quantity += qty;
-    else cart.push({ id: id, name: nama, price: harga, quantity: qty, image: gambar });
+    const currentQty = item ? item.quantity : 0;
+
+    // Validasi stok: total qty di keranjang tidak boleh melebihi stok
+    if (currentQty + qty > stok) {
+        Swal.fire({ 
+            toast: true,
+            position: 'top-end',
+            icon: 'warning', 
+            title: 'Stok Tidak Cukup!', 
+            text: `Sisa stok ${nama} hanya ${stok} pcs.`, 
+            showConfirmButton: false, 
+            timer: 2000 
+        });
+        return;
+    }
+
+    if (item) {
+        item.quantity += qty;
+        item.stok = stok; // Simpan info stok
+    } else {
+        cart.push({ id: id, name: nama, price: harga, quantity: qty, image: gambar, stok: stok });
+    }
     
     saveCart();
     Swal.fire({ 
@@ -226,7 +258,7 @@ function updateCartUI() {
 
                     <div class="flex items-center gap-2.5 ml-auto mr-8">
                         <button type="button" onclick="kurangiQty(${index})" class="w-6 h-6 border border-border-dark bg-white rounded cursor-pointer flex justify-center items-center hover:bg-gray-100">-</button>
-                        <span class="font-bold">${item.quantity}</span>
+                        <input type="number" min="1" max="${item.stok || 9999}" value="${item.quantity}" onchange="setCartQty(${index}, this.value)" class="w-10 h-7 text-center border border-border-dark rounded text-sm font-bold outline-none focus:border-primary-brown">
                         <button type="button" onclick="tambahQty(${index})" class="w-6 h-6 border border-border-dark bg-white rounded cursor-pointer flex justify-center items-center hover:bg-gray-100">+</button>
                     </div>
 
@@ -240,11 +272,16 @@ function updateCartUI() {
     }
 }
 
-// Fungsi tombol +/- di halaman detail
+// Fungsi tombol +/- di halaman detail (dengan validasi stok)
 function changeQty(amount) {
     const qtyInput = document.getElementById('qty');
-    if(qtyInput && parseInt(qtyInput.value) + amount >= 1) {
-        qtyInput.value = parseInt(qtyInput.value) + amount;
+    if (!qtyInput) return;
+    const maxStok = parseInt(qtyInput.getAttribute('max')) || 9999;
+    const newVal = parseInt(qtyInput.value) + amount;
+    if (newVal >= 1 && newVal <= maxStok) {
+        qtyInput.value = newVal;
+    } else if (newVal > maxStok) {
+        Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: 'Batas Stok!', text: `Stok tersedia hanya ${maxStok} pcs.`, showConfirmButton: false, timer: 2000 });
     }
 }
 
@@ -274,12 +311,15 @@ function renderCheckoutSummary() {
 
 
 
-// Fungsi untuk menambah Qty di keranjang
+// Fungsi untuk menambah Qty di keranjang (dengan validasi stok)
 function tambahQty(index) {
+    const maxStok = cart[index].stok || 9999;
+    if (cart[index].quantity >= maxStok) {
+        Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: 'Stok Habis!', text: `Sisa stok hanya ${maxStok} pcs.`, showConfirmButton: false, timer: 2000 });
+        return;
+    }
     cart[index].quantity += 1;
-    // Simpan perubahan ke LocalStorage
     localStorage.setItem('alfazza_cart', JSON.stringify(cart));
-    // Refresh tampilan keranjang
     updateCartUI();
 }
 
@@ -292,6 +332,22 @@ function kurangiQty(index) {
     } else {
         removeFromCart(index);
     }
+}
+
+// Fungsi input ketik langsung untuk qty di keranjang user
+function setCartQty(index, value) {
+    const newQty = parseInt(value);
+    const maxStok = cart[index].stok || 50;
+    if (isNaN(newQty) || newQty < 1) {
+        cart[index].quantity = 1;
+    } else if (newQty > maxStok) {
+        Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: 'Melebihi Stok!', text: `Stok tersedia hanya ${maxStok} pcs.`, showConfirmButton: false, timer: 2000 });
+        cart[index].quantity = maxStok;
+    } else {
+        cart[index].quantity = newQty;
+    }
+    localStorage.setItem('alfazza_cart', JSON.stringify(cart));
+    updateCartUI();
 }
 
 // 6. Fungsi Custom Order
@@ -608,10 +664,11 @@ function renderPosCart() {
                 <div>
                     <h4 class="text-[0.95rem] text-text-dark m-0 mb-1">${item.nama}</h4>
                     <div class="text-[0.85rem] text-text-light">Rp ${item.harga.toLocaleString('id-ID')}</div>
+                    <div class="text-[0.75rem] text-text-light">Stok: ${item.stok} pcs</div>
                 </div>
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2">
                     <button class="bg-bg-light border-none w-6 h-6 rounded-full cursor-pointer font-bold hover:bg-border-medium transition" onclick="changePosQty(${item.id}, -1)">-</button>
-                    <span class="font-semibold">${item.qty}</span>
+                    <input type="number" min="1" max="${item.stok}" value="${item.qty}" onchange="setPosQty(${item.id}, this.value)" class="w-12 h-7 text-center border border-border-dark rounded text-sm font-bold outline-none focus:border-primary-brown">
                     <button class="bg-bg-light border-none w-6 h-6 rounded-full cursor-pointer font-bold hover:bg-border-medium transition" onclick="changePosQty(${item.id}, 1)">+</button>
                 </div>
                 <div class="font-bold">Rp ${subtotal.toLocaleString('id-ID')}</div>
@@ -625,6 +682,22 @@ function renderPosCart() {
     // Update FAB cart count
     const fabCount = document.getElementById('fab-cart-count');
     if(fabCount) fabCount.textContent = posCart.reduce((total, item) => total + item.qty, 0);
+}
+
+// Fungsi input ketik langsung untuk qty di kasir POS
+function setPosQty(id, value) {
+    let item = posCart.find(i => i.id == id);
+    if (!item) return;
+    const newQty = parseInt(value);
+    if (isNaN(newQty) || newQty < 1) {
+        item.qty = 1;
+    } else if (newQty > item.stok) {
+        Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: 'Melebihi Stok!', text: `Stok tersedia hanya ${item.stok} pcs.`, showConfirmButton: false, timer: 2000 });
+        item.qty = item.stok;
+    } else {
+        item.qty = newQty;
+    }
+    renderPosCart();
 }
 
 let posGrandTotal = 0;
@@ -776,6 +849,14 @@ function payNow() {
         return;
     }
 
+    // Validasi No HP: hanya angka, panjang 10-13 digit
+    const regexPhone = /^[0-9]{10,13}$/;
+    if (!regexPhone.test(noHp.trim())) {
+        Swal.fire({ icon: 'warning', text: 'No HP hanya boleh berisi angka, minimal 10 dan maksimal 13 digit!' });
+        document.getElementById('nohp').focus();
+        return;
+    }
+
     // CATATAN: Kalau di form checkout biasa ini kamu JUGA punya input tanggal pengiriman (misal id-nya 'tanggal_kirim'), tambahkan juga seperti ini:
     let tanggalKirim = document.getElementById('tanggal_kirim')?.value;
     if (!tanggalKirim || tanggalKirim.trim() === "") {
@@ -796,6 +877,21 @@ function payNow() {
     if (!alamat || alamat.trim() === "") {
         Swal.fire({ icon: 'warning', text: 'Mohon isi Alamat Pengiriman!' });
         document.getElementById('alamat').focus();
+        return;
+    }
+
+    // Validasi Alamat: maksimal 300 karakter
+    if (alamat.trim().length > 300) {
+        Swal.fire({ icon: 'warning', text: 'Detail Alamat terlalu panjang! Maksimal 300 karakter.' });
+        document.getElementById('alamat').focus();
+        return;
+    }
+
+    // Validasi Catatan: maksimal 200 karakter (ambil nilai sekarang)
+    let catatanVal = document.getElementById('catatan')?.value || '';
+    if (catatanVal.trim().length > 200) {
+        Swal.fire({ icon: 'warning', text: 'Catatan terlalu panjang! Maksimal 200 karakter.' });
+        document.getElementById('catatan').focus();
         return;
     }
 
