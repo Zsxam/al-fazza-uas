@@ -36,7 +36,7 @@
                         <div class="mt-3.5 text-text-medium leading-[1.6] text-base">
                             <p><strong><i class="fa-solid fa-wheat-awn"></i> Bahan Utama:</strong> <span>{{ $kue->bahan ?? 'Informasi bahan belum tersedia.' }}</span></p>
                             <hr class="my-5">
-                            <p><strong><i class="fa-solid fa-jar"></i> Saran Penyimpanan:</strong> Simpan dalam wadah tertutup rapat. Tahan 2 hari di suhu ruang, 4-5 hari di dalam lemari pendingin.</p>
+                            <p><strong><i class="fa-solid fa-jar"></i> Saran Penyimpanan:</strong> {{ $kue->saran_penyimpanan ?? 'Informasi saran penyimpanan belum tersedia.' }}</p>
                             <hr class="my-5">
                         </div>
                     </details>

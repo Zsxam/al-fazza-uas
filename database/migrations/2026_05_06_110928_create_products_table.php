@@ -22,6 +22,7 @@ return new class extends Migration
             $table->integer('stok')->default(0); 
             $table->text('deskripsi')->nullable();
             $table->text('bahan')->nullable();
+            $table->text('saran_penyimpanan')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

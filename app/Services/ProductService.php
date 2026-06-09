@@ -28,6 +28,7 @@ class ProductService
             'stok' => $data['stok'],
             'deskripsi' => $data['deskripsi'],
             'bahan' => $data['bahan'],
+            'saran_penyimpanan' => $data['saran_penyimpanan'] ?? null,
             'gambar' => $gambarPath,
             'rating' => 4.9, // Default rating
         ]);
@@ -57,6 +58,7 @@ class ProductService
             'harga' => $data['harga'],
             'deskripsi' => $data['deskripsi'],
             'bahan' => $data['bahan'],
+            'saran_penyimpanan' => $data['saran_penyimpanan'] ?? null,
             'gambar' => $gambarPath,
         ]);
 
