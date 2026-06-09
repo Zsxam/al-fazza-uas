@@ -356,6 +356,10 @@ function prosesCustomOrderMidtrans() {
         Swal.fire({ icon: 'warning', text: 'Mohon isi No WhatsApp!' });
         document.getElementById('co_nohp').focus();
         return; 
+    } else if (nohp.length > 15) { 
+        Swal.fire({ icon: 'warning', text: 'No WhatsApp tidak boleh lebih dari 15 karakter!' });
+        document.getElementById('co_nohp').focus();
+        return; 
     }
 
     // === DETEKTOR SPESIFIKASI KUE (Wajib Pilih) ===
@@ -387,10 +391,19 @@ function prosesCustomOrderMidtrans() {
         Swal.fire({ icon: 'warning', text: 'Mohon isi Tema/Warna kue!' });
         document.getElementById('co_tema').focus();
         return; 
+    } else if (tema.length > 70) { // <-- Ini kode tambahannya
+        Swal.fire({ icon: 'warning', text: 'Tema dan warna kue maksimal 70 karakter!' });
+        document.getElementById('co_tema').focus();
+        return; 
     }
+
 
     if (!tulisan || tulisan.trim() === "") {
         Swal.fire({ icon: 'warning', text: 'Mohon isi Tulisan di atas kue' });
+        document.getElementById('co_tulisan').focus();
+        return; 
+    } else if (tulisan.length > 25) { // <-- Ini kode tambahannya
+        Swal.fire({ icon: 'warning', text: 'Tulisan di atas kue maksimal 25 karakter!' });
         document.getElementById('co_tulisan').focus();
         return; 
     }
@@ -419,6 +432,16 @@ function prosesCustomOrderMidtrans() {
     if (metode === "Dikirim" && (!alamat || alamat.trim() === "")) {
         Swal.fire({ icon: 'warning', text: 'Mohon isi detail alamat pengiriman!' });
         document.getElementById('co_alamat').focus();
+        return; 
+    } else if (alamat.length > 100) { // <-- Ini kode tambahannya
+        Swal.fire({ icon: 'warning', text: 'alamat maksimal 100 karakter!' });
+        document.getElementById('co_alamat').focus();
+        return; 
+    }
+
+    if (catatan.length > 250) {
+        Swal.fire({ icon: 'warning', text: 'Catatan tambahan maksimal 250 karakter!' });
+        document.getElementById('co_catatan').focus();
         return; 
     }
 
@@ -907,5 +930,28 @@ window.hideLoader = function() {
     if(loader) {
         loader.classList.remove('flex');
         loader.classList.add('hidden');
+    }
+
+}
+
+// === FUNGSI PENGHITUNG KARAKTER OTOMATIS ===
+function updateCounter(inputId, counterId, max) {
+    // 1. Ambil elemen input dan elemen teks angkanya
+    const inputElement = document.getElementById(inputId);
+    const counterElement = document.getElementById(counterId);
+    
+    // 2. Hitung jumlah huruf yang sedang diketik
+    const currentLength = inputElement.value.length;
+    
+    // 3. Ubah teksnya menjadi Format: AngkaSekarang/Maksimal (Contoh: 12/100)
+    counterElement.innerText = `${currentLength}/${max}`;
+
+    // Opsional (Biar Keren): Ubah warnanya jadi merah kalau sudah penuh/maksimal
+    if (currentLength >= max) {
+        counterElement.classList.add('text-red-500');
+        counterElement.classList.remove('text-gray-500');
+    } else {
+        counterElement.classList.remove('text-red-500');
+        counterElement.classList.add('text-gray-500');
     }
 }
