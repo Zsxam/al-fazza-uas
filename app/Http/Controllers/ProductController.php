@@ -13,17 +13,15 @@ class ProductController extends Controller
         $products = Product::latest()->limit(6)->get(); 
 
         // Ambil 4 produk terlaris berdasarkan total qty terjual (via TransactionDetail).
-        // Menggunakan withSum() agar kompatibel dengan MySQL strict mode (no GROUP BY issue).
-        // Kita ubah query terlaris menjadi seperti ini:
         $terlaris = Product::withSum(['details as total_terjual' => function ($query) {
-            // 1. Hanya hitung transaksi yang statusnya 'success'
+            // Hanya hitung transaksi yang statusnya 'success'
             $query->whereHas('transaction', function ($q) {
                 $q->where('payment_status', 'success');
             });
         }], 'qty')
-        ->get() // Tarik semua datanya dulu
-        ->sortByDesc('total_terjual') // 2. Urutkan menggunakan PHP (Netral)
-        ->take(4); // 3. Ambil 4 teratas
+        ->get() 
+        ->sortByDesc('total_terjual')
+        ->take(4);
 
         return view('index', compact('products', 'terlaris'));
     }

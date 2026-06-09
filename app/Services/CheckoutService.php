@@ -83,8 +83,7 @@ class CheckoutService
                 ]);
 
                 // Untuk order kasir: langsung kurangi stok karena pembayaran tunai/langsung
-                // Untuk order online: stok BELUM dikurangi di sini.
-                // Stok akan dikurangi oleh handleMidtransCallback saat status menjadi 'success'.
+                // Untuk order online: stok BELUM dikurangi di sini. (Stok akan dikurangi oleh handleMidtransCallback saat status menjadi 'success')
                 if ($orderType === 'kasir') {
                     $product = Product::find($vItem['product_id']);
                     $product->decrement('stok', $vItem['qty']);
@@ -261,8 +260,6 @@ class CheckoutService
                 $transaksi->update(['payment_status' => 'pending']);
             } else if ($transaction == 'deny' || $transaction == 'expire' || $transaction == 'cancel') {
                 $transaksi->update(['payment_status' => 'failed']);
-                // Untuk order online: stok tidak perlu dikembalikan karena memang belum pernah dikurangi.
-                // (Pengurangan stok hanya terjadi saat settlement/capture sukses di atas)
             }
 
             if ($transaksi->customer_email && in_array($transaksi->payment_status, ['success', 'failed'])) {
@@ -288,10 +285,9 @@ class CheckoutService
         }
     }
 
-    /**
-     * Konfigurasi Midtrans SDK — dipanggil sebelum setiap operasi Midtrans.
-     * SSL bypass hanya diaktifkan di environment local (localhost/XAMPP).
-     */
+    // Konfigurasi Midtrans SDK — dipanggil sebelum setiap operasi Midtrans.
+    // SSL bypass hanya diaktifkan di environment local (localhost/XAMPP).
+    
     private function configureMidtrans()
     {
         Config::$serverKey    = config('midtrans.server_key');
@@ -305,15 +301,15 @@ class CheckoutService
             Config::$curlOptions = [
                 CURLOPT_SSL_VERIFYHOST => 0,
                 CURLOPT_SSL_VERIFYPEER => 0,
-                CURLOPT_HTTPHEADER     => [], // Fix bug SDK Midtrans (Undefined array key 10023)
+                CURLOPT_HTTPHEADER     => [], 
             ];
         }
     }
 
-    /**
-     * Kurangi stok produk setelah pembayaran online dikonfirmasi sukses oleh Midtrans.
-     * Dipanggil dari handleMidtransCallback saat status settlement atau capture+success.
-     */
+    
+    // Kurangi stok produk setelah pembayaran online dikonfirmasi sukses oleh Midtrans.
+    // Dipanggil dari handleMidtransCallback saat status settlement atau capture+success.
+    
     private function kurangiStokOnline($transaksi, $order_id)
     {
         $details = TransactionDetail::where('transaction_id', $transaksi->id)->get();

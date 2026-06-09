@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('content')
-    <!-- HERO SECTION DENGAN MASKOT -->
+    <!-- HERO SECTION -->
     <section class="bg-primary-brown pt-12 pb-16 px-5 md:px-12 lg:px-24 rounded-b-[30px] md:rounded-b-[50px] relative overflow-hidden mb-16 shadow-lg border-b-4 border-dark-brown/20">
         <!-- Dekorasi Background -->
         <!-- <div class="absolute -top-24 -right-24 w-72 h-72 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -27,7 +27,7 @@
         </div>
     </section>
 
-    <!-- TERLARIS SECTION (GRID BARU) -->
+    <!-- SECTION TERLARIS -->
     <section id="terlaris" class="max-w-6xl mx-auto px-5 lg:px-0 mb-16">
         <div class="text-center mb-10">
             <h2 class="text-3xl md:text-4xl font-extrabold text-black inline-flex items-center gap-3">

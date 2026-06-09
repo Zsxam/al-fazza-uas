@@ -51,7 +51,7 @@ class KasirController extends Controller
             'kasir',
             $request->payment_method,
             $request->amount_paid,
-            $request->change_amount, // The service doesn't fully validate this right now, we can pass it
+            $request->change_amount,
             'success'
         );
 
@@ -74,14 +74,14 @@ class KasirController extends Controller
         $transaksi = Transaction::with('details.product')->findOrFail($id);
         
         // Menghitung tinggi kertas secara dinamis berdasarkan jumlah produk
-        $baseHeight = 270; // Tinggi dasar untuk header, info kasir, total, dan footer
-        $itemHeight = 35; // Tinggi perkiraan untuk setiap baris produk
+        $baseHeight = 270;
+        $itemHeight = 35; 
         $totalItems = $transaksi->details->count();
         
         $dynamicHeight = $baseHeight + ($totalItems * $itemHeight);
         
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('kasir.struk_pdf', compact('transaksi'));
-        $pdf->setPaper([0, 0, 226, $dynamicHeight], 'portrait'); // Custom width 80mm, dynamic height
+        $pdf->setPaper([0, 0, 226, $dynamicHeight], 'portrait'); 
         
         return $pdf->stream('Struk_Pembayaran_' . $transaksi->invoice_number . '.pdf');
     }

@@ -20,13 +20,11 @@ class DashboardController extends Controller
                                   ->where('payment_status', 'success')
                                   ->count();
 
-        // Fix #11: filter hanya transaksi sukses agar angka pendapatan akurat
         $penjualanBulanIni = Transaction::where('payment_status', 'success')
                                         ->whereMonth('created_at', Carbon::now()->month)
                                         ->whereYear('created_at', Carbon::now()->year)
                                         ->sum('total_amount');
 
-        // Fix #12: ganti 7 query terpisah (N+1) dengan 1 query GROUP BY
         $startDate = Carbon::now()->subDays(6)->startOfDay();
         $endDate   = Carbon::now()->endOfDay();
 

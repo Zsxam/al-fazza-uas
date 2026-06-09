@@ -77,12 +77,11 @@ class TransactionSeeder extends Seeder
         ]);
 
         // 2. Buat data rincian rotinya (Isi dari keranjang belanja)
-        // Kita asumsikan product_id 1 dan 2 itu sudah ada dari ProductSeeder
         DB::table('transaction_details')->insert([
             // Isi keranjang untuk INV-001 (Transaksi ID 1)
             [
                 'transaction_id' => 1,
-                'product_id' => 1, // Misalnya Cheese Cake
+                'product_id' => 1, 
                 'qty' => 10,
                 'price' => 13500,
                 'subtotal' => 135000,
@@ -92,7 +91,7 @@ class TransactionSeeder extends Seeder
             // Isi keranjang untuk INV-002 (Transaksi ID 2)
             [
                 'transaction_id' => 2,
-                'product_id' => 2, // Misalnya Meses
+                'product_id' => 2, 
                 'qty' => 10,
                 'price' => 11900,
                 'subtotal' => 119000,

@@ -103,7 +103,6 @@ class TransactionController extends Controller
         $invoice = 'CST-' . date('YmdHis');
 
         // Harga dihitung server-side berdasarkan ukuran kue yang tervalidasi.
-        // Ini mencegah manipulasi harga dari sisi client.
         $pricemap = [
             '16 cm' => 150000,
             '18 cm' => 180000,

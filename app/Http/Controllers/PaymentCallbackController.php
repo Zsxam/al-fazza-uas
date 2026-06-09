@@ -18,9 +18,6 @@ class PaymentCallbackController extends Controller
     {
         $serverKey = config('midtrans.server_key');
         
-        // Midtrans selalu mengirimkan gross_amount dengan format .00 (misal "15000.00").
-        // Laravel sering otomatis mengubahnya menjadi angka bulat (15000).
-        // Kita harus mengembalikannya ke format .00 agar gembok/signature-nya cocok!
         $grossAmount = number_format((float) $request->gross_amount, 2, '.', '');
         
         $hashed = hash("sha512", $request->order_id . $request->status_code . $grossAmount . $serverKey);

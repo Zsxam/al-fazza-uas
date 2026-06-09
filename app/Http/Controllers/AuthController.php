@@ -11,7 +11,7 @@ class AuthController extends Controller
     // 1. Menampilkan halaman form login
     public function showLogin()
     {
-        return view('login'); // Nanti kita buat file login.blade.php
+        return view('login');
     }
 
     // 2. Memproses data dari form login
@@ -25,7 +25,7 @@ class AuthController extends Controller
 
         // Coba login dengan Auth::attempt
         if (Auth::attempt($credentials)) {
-            // Jika berhasil, perbarui sesi agar aman dari serangan hacker
+            // Jika berhasil, perbarui sesi 
             $request->session()->regenerate();
 
             // Cek role user yang baru saja login

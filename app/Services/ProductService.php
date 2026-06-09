@@ -65,8 +65,7 @@ class ProductService
 
     public function deleteProduct(Product $product)
     {
-        // Karena menggunakan SoftDeletes, file gambar fisik tidak dihapus
-        // agar foto produk di riwayat invoice lama (pelanggan) tidak rusak.
+        // Karena menggunakan SoftDeletes, file gambar fisik tidak dihapus agar foto produk di riwayat invoice lama (pelanggan) tidak rusak.
         $product->delete();
     }
 }

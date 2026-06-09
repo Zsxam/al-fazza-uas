@@ -25,7 +25,6 @@
                 <span class="text-text-light">Status</span>
                 <span class="py-0.5 px-2.5 rounded-3xl text-xs font-bold" style="background: {{ $ui['bg_color'] }}; color: {{ $ui['color'] }};">{{ $ui['badge'] }}</span>
             </div>
-                        <!-- Tambahan Data Pelanggan -->
             <div class="flex justify-between border-b border-dashed border-border-medium pb-2 mb-2 mt-4">
                 <span class="text-text-light">Nama Pelanggan</span>
                 <strong class="text-text-dark text-right">{{ $transaksi->customer_name }}<br><small class="font-normal">{{ $transaksi->customer_phone }}</small></strong>

@@ -8,7 +8,7 @@ class UpdateOrderStatusRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true; // Asumsikan otorisasi admin sudah ditangani oleh middleware auth dan is_admin
+        return true;
     }
 
     public function rules(): array
