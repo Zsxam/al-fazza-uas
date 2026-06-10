@@ -13,7 +13,6 @@ function updateCharCount(fieldId, maxLength) {
     counter.style.color = len >= maxLength * 0.9 ? '#ef4444' : '';
 }
 
-
 document.addEventListener("DOMContentLoaded", () => {
     // === TAMBAHAN KUNCI TANGGAL ===
     // Sesuaikan ID-nya. Kalau untuk Custom Order: 'co_tanggal'. 
@@ -244,7 +243,6 @@ function updateCartUI() {
         elItems.innerHTML = cart.map((item, index) => {
             let sub = item.price * item.quantity;
             grandTotal += sub;
-    // GANTI MENJADI SEPERTI INI:
             return `
                 <div class="flex items-center mb-4 relative border-b border-border-light border-dashed pb-4">
                     
@@ -258,7 +256,7 @@ function updateCartUI() {
 
                     <div class="flex items-center gap-2.5 ml-auto mr-8">
                         <button type="button" onclick="kurangiQty(${index})" class="w-6 h-6 border border-border-dark bg-white rounded cursor-pointer flex justify-center items-center hover:bg-gray-100">-</button>
-                        <input type="number" min="1" max="${item.stok || 9999}" value="${item.quantity}" oninput="if(this.value !== ''){ if(parseInt(this.value) > parseInt(this.max)) this.value = this.max; if(parseInt(this.value) < 1) this.value = 1; }" onchange="setCartQty(${index}, this.value)" class="w-10 h-7 text-center border border-border-dark rounded text-sm font-bold outline-none focus:border-primary-brown">
+                        <input type="number" min="1" max="${item.stok || 999}" value="${item.quantity}" oninput="if(this.value !== ''){ if(parseInt(this.value) > parseInt(this.max)) this.value = this.max; if(parseInt(this.value) < 1) this.value = 1; }" onchange="setCartQty(${index}, this.value)" class="w-10 h-7 text-center border border-border-dark rounded text-sm font-bold outline-none focus:border-primary-brown [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
                         <button type="button" onclick="tambahQty(${index})" class="w-6 h-6 border border-border-dark bg-white rounded cursor-pointer flex justify-center items-center hover:bg-gray-100">+</button>
                     </div>
 
@@ -691,7 +689,7 @@ function renderPosCart() {
                 </div>
                 <div class="flex items-center gap-2">
                     <button class="bg-bg-light border-none w-6 h-6 rounded-full cursor-pointer font-bold hover:bg-border-medium transition" onclick="changePosQty(${item.id}, -1)">-</button>
-                    <input type="number" min="1" max="${item.stok}" value="${item.qty}" oninput="if(this.value !== ''){ if(parseInt(this.value) > parseInt(this.max)) this.value = this.max; if(parseInt(this.value) < 1) this.value = 1; }" onchange="setPosQty(${item.id}, this.value)" class="w-12 h-7 text-center border border-border-dark rounded text-sm font-bold outline-none focus:border-primary-brown">
+                    <input type="number" min="1" max="${item.stok}" value="${item.qty}" oninput="if(this.value !== ''){ if(parseInt(this.value) > parseInt(this.max)) this.value = this.max; if(parseInt(this.value) < 1) this.value = 1; }" onchange="setPosQty(${item.id}, this.value)" class="w-12 h-7 text-center border border-border-dark rounded text-sm font-bold outline-none focus:border-primary-brown [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
                     <button class="bg-bg-light border-none w-6 h-6 rounded-full cursor-pointer font-bold hover:bg-border-medium transition" onclick="changePosQty(${item.id}, 1)">+</button>
                 </div>
                 <div class="font-bold">Rp ${subtotal.toLocaleString('id-ID')}</div>
@@ -1090,24 +1088,3 @@ window.hideLoader = function() {
 
 }
 
-// === FUNGSI PENGHITUNG KARAKTER OTOMATIS ===
-function updateCounter(inputId, counterId, max) {
-    // 1. Ambil elemen input dan elemen teks angkanya
-    const inputElement = document.getElementById(inputId);
-    const counterElement = document.getElementById(counterId);
-    
-    // 2. Hitung jumlah huruf yang sedang diketik
-    const currentLength = inputElement.value.length;
-    
-    // 3. Ubah teksnya menjadi Format: AngkaSekarang/Maksimal (Contoh: 12/100)
-    counterElement.innerText = `${currentLength}/${max}`;
-
-    // Opsional (Biar Keren): Ubah warnanya jadi merah kalau sudah penuh/maksimal
-    if (currentLength >= max) {
-        counterElement.classList.add('text-red-500');
-        counterElement.classList.remove('text-gray-500');
-    } else {
-        counterElement.classList.remove('text-red-500');
-        counterElement.classList.add('text-gray-500');
-    }
-}

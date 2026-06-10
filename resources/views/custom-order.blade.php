@@ -67,8 +67,8 @@
 
                         <div class="flex-1 min-w-48 mb-4">
                             <label class="block mb-1.5 font-medium text-sm text-text-medium">No. WhatsApp *</label>
-                            <input type="text" id="co_nohp" required maxlength="15" oninput="updateCounter('co_nohp', 'counter_nohp', 15)" placeholder="Contoh: 083123456789" class="form-input">
-                            <div id="counter_nohp" class="text-right text-xs text-gray-500 mt-1">0/15</div>
+                            <input type="text" id="co_nohp" required maxlength="13" oninput="updateCharCount('co_nohp', 13)" placeholder="Contoh: 083123456789" class="form-input">
+                            <div class="text-right text-xs text-gray-400 mt-1"><span id="co_nohp-count">0</span>/13</div>
                         </div>
 
                     </div>
@@ -126,13 +126,13 @@
                     
                     <div class="mb-3.5">
                         <label class="block mb-1.5 font-medium text-sm">Tema & Warna Dominan *</label>
-                        <input type="text" id="co_tema" required maxlength="70" oninput="updateCounter('co_tema', 'counter_tema', 70)" placeholder="Contoh: Tema Spiderman, Warna Biru" class="form-input">
-                        <div id="counter_tema" class="text-right text-xs text-gray-500 mt-1">0/70</div>
+                        <input type="text" id="co_tema" required maxlength="70" oninput="updateCharCount('co_tema', 70)" placeholder="Contoh: Tema Spiderman, Warna Biru" class="form-input">
+                        <div class="text-right text-xs text-gray-400 mt-1"><span id="co_tema-count">0</span>/70 karakter</div>
                     </div>
                     <div class="mb-6">
                         <label class="block mb-1.5 font-medium text-sm">Tulisan di Atas Kue *</label>
-                        <input type="text" id="co_tulisan" required maxlength="25" oninput="updateCounter('co_tulisan', 'counter_tulisan', 25)" placeholder="Contoh: Happy Birthday Mama ke-50" class="form-input">
-                        <div id="counter_tulisan" class="text-right text-xs text-gray-500 mt-1">0/25</div>
+                        <input type="text" id="co_tulisan" required maxlength="25" oninput="updateCharCount('co_tulisan', 25)" placeholder="Contoh: Happy Birthday Mama ke-50" class="form-input">
+                        <div class="text-right text-xs text-gray-400 mt-1"><span id="co_tulisan-count">0</span>/25 karakter</div>
                     </div>
 
                     <h2 class="text-primary-brown border-b-2 border-border-light pb-2.5 mb-5 mt-8 font-bold text-2xl">Waktu & Pengiriman</h2>
@@ -154,8 +154,8 @@
                     
                     <div id="co_alamat_group" class="hidden mb-5">
                         <label class="block mb-1.5 font-medium text-sm">Alamat Pengiriman *</label>
-                        <textarea id="co_alamat" rows="4" required maxlength="100" oninput="updateCounter('co_alamat', 'counter_alamat', 100)" placeholder="Isi detail alamat seperti patokan, nomor rumah, RT/RW dll." class="form-input"></textarea>
-                        <div id="counter_alamat" class="text-right text-xs text-gray-500 mt-1">0/100</div>
+                        <textarea id="co_alamat" rows="4" required maxlength="300" oninput="updateCharCount('co_alamat', 300)" placeholder="Isi detail alamat seperti patokan, nomor rumah, RT/RW dll." class="form-input"></textarea>
+                        <div class="text-right text-xs text-gray-400 mt-1"><span id="co_alamat-count">0</span>/300 karakter</div>
                     </div>
 
                     <div class="flex items-center gap-2.5 bg-green-100 p-4 rounded-lg text-success mt-5">
@@ -233,4 +233,15 @@
     </div>
 
     <script src="https://app{{ config('midtrans.is_production') ? '' : '.sandbox' }}.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
+    <script>
+        const noHpInput = document.getElementById('co_nohp');
+
+        if (noHpInput) {
+            // Event 'input' berjalan setiap kali ada karakter yang diketik
+            noHpInput.addEventListener("input", function (e) {
+                // Hapus SEMUA karakter selain angka (0-9) secara instan
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        }
+    </script>
 @endsection
