@@ -67,6 +67,7 @@ class ReportController extends Controller
                 ];
                 
                 $row = [
+                    // $t->customer_name ?? 'Pelanggan kasir', 
                     $t->created_at->format('Y-m-d H:i'),
                     $t->invoice_number,
                     $orderTypeMap[$t->order_type] ?? $t->order_type,

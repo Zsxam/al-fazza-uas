@@ -25,6 +25,12 @@ class ProductController extends Controller
         ->sortByDesc('total_terjual') // 2. Urutkan menggunakan PHP (Netral)
         ->take(4); // 3. Ambil 4 teratas
 
+            // foreach($products as $p) {
+            //     if($p->nama == 'Cheese Cake') { // Ganti dengan nama produk yang diminta
+            //         $p->harga = 15000; // Harga baru
+            //     }
+            // }
+
         return view('index', compact('products', 'terlaris'));
     }
 
@@ -33,6 +39,12 @@ class ProductController extends Controller
         $products = Product::where('kategori', $jenis)->get();
         $judul = 'Aneka ' . ucfirst($jenis);
         
+        // foreach($products as $p) {
+        //     if($p->nama == 'Lidah Kucing') { // Ganti dengan nama produk yang diminta
+        //         $p->harga = 15000; // Harga baru
+        //     }
+        // }
+
         return view('kategori', compact('products', 'judul'));
     }
 

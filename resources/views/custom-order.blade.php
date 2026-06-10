@@ -67,7 +67,8 @@
 
                         <div class="flex-1 min-w-48 mb-4">
                             <label class="block mb-1.5 font-medium text-sm text-text-medium">No. WhatsApp *</label>
-                            <input type="text" id="co_nohp" required placeholder="Contoh: 083123456789" class="form-input">
+                            <input type="text" id="co_nohp" required maxlength="15" oninput="updateCounter('co_nohp', 'counter_nohp', 15)" placeholder="Contoh: 083123456789" class="form-input">
+                            <div id="counter_nohp" class="text-right text-xs text-gray-500 mt-1">0/15</div>
                         </div>
 
                     </div>
@@ -125,11 +126,13 @@
                     
                     <div class="mb-3.5">
                         <label class="block mb-1.5 font-medium text-sm">Tema & Warna Dominan *</label>
-                        <input type="text" id="co_tema" required placeholder="Contoh: Tema Spiderman, Warna Biru" class="form-input">
+                        <input type="text" id="co_tema" required maxlength="70" oninput="updateCounter('co_tema', 'counter_tema', 70)" placeholder="Contoh: Tema Spiderman, Warna Biru" class="form-input">
+                        <div id="counter_tema" class="text-right text-xs text-gray-500 mt-1">0/70</div>
                     </div>
                     <div class="mb-6">
                         <label class="block mb-1.5 font-medium text-sm">Tulisan di Atas Kue *</label>
-                        <input type="text" id="co_tulisan" required placeholder="Contoh: Happy Birthday Mama ke-50" class="form-input">
+                        <input type="text" id="co_tulisan" required maxlength="25" oninput="updateCounter('co_tulisan', 'counter_tulisan', 25)" placeholder="Contoh: Happy Birthday Mama ke-50" class="form-input">
+                        <div id="counter_tulisan" class="text-right text-xs text-gray-500 mt-1">0/25</div>
                     </div>
 
                     <h2 class="text-primary-brown border-b-2 border-border-light pb-2.5 mb-5 mt-8 font-bold text-2xl">Waktu & Pengiriman</h2>
@@ -151,7 +154,8 @@
                     
                     <div id="co_alamat_group" class="hidden mb-5">
                         <label class="block mb-1.5 font-medium text-sm">Alamat Pengiriman *</label>
-                        <textarea id="co_alamat" rows="4" placeholder="Isi detail alamat seperti patokan, nomor rumah, RT/RW dll." class="form-input"></textarea>
+                        <textarea id="co_alamat" rows="4" required maxlength="100" oninput="updateCounter('co_alamat', 'counter_alamat', 100)" placeholder="Isi detail alamat seperti patokan, nomor rumah, RT/RW dll." class="form-input"></textarea>
+                        <div id="counter_alamat" class="text-right text-xs text-gray-500 mt-1">0/100</div>
                     </div>
 
                     <div class="flex items-center gap-2.5 bg-green-100 p-4 rounded-lg text-success mt-5">
@@ -218,7 +222,8 @@
                 <div class="bg-primary-brown text-white p-4">
                     <h3 class="m-0 text-lg font-bold">Catatan Tambahan</h3>
                 </div>
-                <textarea id="co_catatan" rows="3" placeholder="Contoh: Krim jangan terlalu manis, dll." class="w-full p-2.5 rounded-lg font-inherit outline-none focus:border-primary-brown"></textarea>
+                <textarea id="co_catatan" rows="3" maxlength="250" oninput="updateCounter('co_catatan', 'counter_catatan', 250)" placeholder="Contoh: Krim jangan terlalu manis, dll." class="w-full p-2.5 rounded-lg font-inherit outline-none focus:border-primary-brown"></textarea>
+                <div id="counter_catatan" class="text-right text-xs text-gray-500 mt-1">0/250</div>
             </div>
 
             <button type="button" onclick="prosesCustomOrderMidtrans()" class="w-full bg-btn-navy text-white p-4 border-none rounded-lg text-lg font-bold cursor-pointer transition-colors duration-300 hover:bg-btn-navy-hover flex justify-center items-center gap-2.5 shadow-[0_4px_6px_rgba(0,0,0,0.1)] mt-5">

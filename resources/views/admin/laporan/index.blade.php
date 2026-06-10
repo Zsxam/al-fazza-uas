@@ -5,7 +5,7 @@
 @section('content')
     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
         <div>
-            <h1 class="text-xl lg:text-3xl font-bold m-0 mb-2">Laporan Penjualan</h1>
+            <h1 class="text-xl lg:text-3xl font-bold m-0 mb-2">Laporan Keuangan & Penjualan</h1>
             <p>Ringkasan semua transaksi sukses dan pendapatan toko.</p>
         </div>
         <div class="flex flex-col lg:flex-row w-full lg:w-auto gap-2">
@@ -51,7 +51,7 @@
 
     <div class="flex flex-col lg:flex-row gap-3 lg:gap-5 mb-8">
         <div class="bg-white p-5 rounded-lg shadow-sm flex-1 border-l-[5px] border-l-success">
-            <h3 class="text-base lg:text-xl font-bold m-0 mb-2">Total Pendapatan</h3>
+            <h1 class="text-base lg:text-xl font-bold m-0 mb-2" >Total Pendapatan</h1>
             <div class="text-2xl lg:text-3xl font-bold text-success">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</div>
         </div>
         <div class="bg-white p-5 rounded-lg shadow-sm flex-1 border-l-[5px] border-l-primary-brown">
@@ -82,6 +82,8 @@
                             <span class="text-primary-brown font-bold"><i class="fa-solid fa-store"></i> Kasir (Offline)</span>
                         @elseif($t->order_type == 'custom-order')
                             <span class="text-purple-500 font-bold"><i class="fa-solid fa-cake-candles"></i> Custom Cake</span>
+                            <br>
+                            <span class="text-xm text-gray-500">{{ $t->custom_details }}</span>
                         @else
                             <span class="text-blue-600 font-bold"><i class="fa-solid fa-globe"></i> Web (Online)</span>
                         @endif
