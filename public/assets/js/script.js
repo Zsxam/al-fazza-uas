@@ -2,6 +2,18 @@
 let cart = JSON.parse(localStorage.getItem('alfazza_cart')) || [];
 let posCart = [];
 
+// Helper: Update character counter pada textarea
+function updateCharCount(fieldId, maxLength) {
+    const field = document.getElementById(fieldId);
+    const counter = document.getElementById(fieldId + '-count');
+    if (!field || !counter) return;
+    const len = field.value.length;
+    counter.textContent = len;
+    // Ubah warna jadi merah jika mendekati batas (>90%)
+    counter.style.color = len >= maxLength * 0.9 ? '#ef4444' : '';
+}
+
+
 document.addEventListener("DOMContentLoaded", () => {
     // === TAMBAHAN KUNCI TANGGAL ===
     // Sesuaikan ID-nya. Kalau untuk Custom Order: 'co_tanggal'. 
@@ -163,10 +175,30 @@ function saveCart() {
     updateCartUI();
 }
 
-function addToCart(id, nama, harga, gambar, qty = 1) {
+function addToCart(id, nama, harga, gambar, qty = 1, stok = 9999) {
     let item = cart.find(i => i.id === id);
-    if (item) item.quantity += qty;
-    else cart.push({ id: id, name: nama, price: harga, quantity: qty, image: gambar });
+    const currentQty = item ? item.quantity : 0;
+
+    // Validasi stok: total qty di keranjang tidak boleh melebihi stok
+    if (currentQty + qty > stok) {
+        Swal.fire({ 
+            toast: true,
+            position: 'top-end',
+            icon: 'warning', 
+            title: 'Stok Tidak Cukup!', 
+            text: `Sisa stok ${nama} hanya ${stok} pcs.`, 
+            showConfirmButton: false, 
+            timer: 2000 
+        });
+        return;
+    }
+
+    if (item) {
+        item.quantity += qty;
+        item.stok = stok; // Simpan info stok
+    } else {
+        cart.push({ id: id, name: nama, price: harga, quantity: qty, image: gambar, stok: stok });
+    }
     
     saveCart();
     Swal.fire({ 
@@ -226,7 +258,7 @@ function updateCartUI() {
 
                     <div class="flex items-center gap-2.5 ml-auto mr-8">
                         <button type="button" onclick="kurangiQty(${index})" class="w-6 h-6 border border-border-dark bg-white rounded cursor-pointer flex justify-center items-center hover:bg-gray-100">-</button>
-                        <span class="font-bold">${item.quantity}</span>
+                        <input type="number" min="1" max="${item.stok || 9999}" value="${item.quantity}" oninput="if(this.value !== ''){ if(parseInt(this.value) > parseInt(this.max)) this.value = this.max; if(parseInt(this.value) < 1) this.value = 1; }" onchange="setCartQty(${index}, this.value)" class="w-10 h-7 text-center border border-border-dark rounded text-sm font-bold outline-none focus:border-primary-brown">
                         <button type="button" onclick="tambahQty(${index})" class="w-6 h-6 border border-border-dark bg-white rounded cursor-pointer flex justify-center items-center hover:bg-gray-100">+</button>
                     </div>
 
@@ -240,11 +272,16 @@ function updateCartUI() {
     }
 }
 
-// Fungsi tombol +/- di halaman detail
+// Fungsi tombol +/- di halaman detail (dengan validasi stok)
 function changeQty(amount) {
     const qtyInput = document.getElementById('qty');
-    if(qtyInput && parseInt(qtyInput.value) + amount >= 1) {
-        qtyInput.value = parseInt(qtyInput.value) + amount;
+    if (!qtyInput) return;
+    const maxStok = parseInt(qtyInput.getAttribute('max')) || 9999;
+    const newVal = parseInt(qtyInput.value) + amount;
+    if (newVal >= 1 && newVal <= maxStok) {
+        qtyInput.value = newVal;
+    } else if (newVal > maxStok) {
+        Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: 'Batas Stok!', text: `Stok tersedia hanya ${maxStok} pcs.`, showConfirmButton: false, timer: 2000 });
     }
 }
 
@@ -274,12 +311,15 @@ function renderCheckoutSummary() {
 
 
 
-// Fungsi untuk menambah Qty di keranjang
+// Fungsi untuk menambah Qty di keranjang (dengan validasi stok)
 function tambahQty(index) {
+    const maxStok = cart[index].stok || 9999;
+    if (cart[index].quantity >= maxStok) {
+        Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: 'Stok Habis!', text: `Sisa stok hanya ${maxStok} pcs.`, showConfirmButton: false, timer: 2000 });
+        return;
+    }
     cart[index].quantity += 1;
-    // Simpan perubahan ke LocalStorage
     localStorage.setItem('alfazza_cart', JSON.stringify(cart));
-    // Refresh tampilan keranjang
     updateCartUI();
 }
 
@@ -292,6 +332,22 @@ function kurangiQty(index) {
     } else {
         removeFromCart(index);
     }
+}
+
+// Fungsi input ketik langsung untuk qty di keranjang user
+function setCartQty(index, value) {
+    const newQty = parseInt(value);
+    const maxStok = cart[index].stok || 50;
+    if (isNaN(newQty) || newQty < 1) {
+        cart[index].quantity = 1;
+    } else if (newQty > maxStok) {
+        Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: 'Melebihi Stok!', text: `Stok tersedia hanya ${maxStok} pcs.`, showConfirmButton: false, timer: 2000 });
+        cart[index].quantity = maxStok;
+    } else {
+        cart[index].quantity = newQty;
+    }
+    localStorage.setItem('alfazza_cart', JSON.stringify(cart));
+    updateCartUI();
 }
 
 // 6. Fungsi Custom Order
@@ -356,6 +412,10 @@ function prosesCustomOrderMidtrans() {
         Swal.fire({ icon: 'warning', text: 'Mohon isi No WhatsApp!' });
         document.getElementById('co_nohp').focus();
         return; 
+    } else if (nohp.length > 15) { 
+        Swal.fire({ icon: 'warning', text: 'No WhatsApp tidak boleh lebih dari 15 karakter!' });
+        document.getElementById('co_nohp').focus();
+        return; 
     }
 
     // === DETEKTOR SPESIFIKASI KUE (Wajib Pilih) ===
@@ -387,10 +447,19 @@ function prosesCustomOrderMidtrans() {
         Swal.fire({ icon: 'warning', text: 'Mohon isi Tema/Warna kue!' });
         document.getElementById('co_tema').focus();
         return; 
+    } else if (tema.length > 70) { // <-- Ini kode tambahannya
+        Swal.fire({ icon: 'warning', text: 'Tema dan warna kue maksimal 70 karakter!' });
+        document.getElementById('co_tema').focus();
+        return; 
     }
+
 
     if (!tulisan || tulisan.trim() === "") {
         Swal.fire({ icon: 'warning', text: 'Mohon isi Tulisan di atas kue' });
+        document.getElementById('co_tulisan').focus();
+        return; 
+    } else if (tulisan.length > 25) { // <-- Ini kode tambahannya
+        Swal.fire({ icon: 'warning', text: 'Tulisan di atas kue maksimal 25 karakter!' });
         document.getElementById('co_tulisan').focus();
         return; 
     }
@@ -419,6 +488,16 @@ function prosesCustomOrderMidtrans() {
     if (metode === "Dikirim" && (!alamat || alamat.trim() === "")) {
         Swal.fire({ icon: 'warning', text: 'Mohon isi detail alamat pengiriman!' });
         document.getElementById('co_alamat').focus();
+        return; 
+    } else if (alamat.length > 100) { // <-- Ini kode tambahannya
+        Swal.fire({ icon: 'warning', text: 'alamat maksimal 100 karakter!' });
+        document.getElementById('co_alamat').focus();
+        return; 
+    }
+
+    if (catatan.length > 250) {
+        Swal.fire({ icon: 'warning', text: 'Catatan tambahan maksimal 250 karakter!' });
+        document.getElementById('co_catatan').focus();
         return; 
     }
 
@@ -608,10 +687,11 @@ function renderPosCart() {
                 <div>
                     <h4 class="text-[0.95rem] text-text-dark m-0 mb-1">${item.nama}</h4>
                     <div class="text-[0.85rem] text-text-light">Rp ${item.harga.toLocaleString('id-ID')}</div>
+                    <div class="text-[0.75rem] text-text-light">Stok: ${item.stok} pcs</div>
                 </div>
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2">
                     <button class="bg-bg-light border-none w-6 h-6 rounded-full cursor-pointer font-bold hover:bg-border-medium transition" onclick="changePosQty(${item.id}, -1)">-</button>
-                    <span class="font-semibold">${item.qty}</span>
+                    <input type="number" min="1" max="${item.stok}" value="${item.qty}" oninput="if(this.value !== ''){ if(parseInt(this.value) > parseInt(this.max)) this.value = this.max; if(parseInt(this.value) < 1) this.value = 1; }" onchange="setPosQty(${item.id}, this.value)" class="w-12 h-7 text-center border border-border-dark rounded text-sm font-bold outline-none focus:border-primary-brown">
                     <button class="bg-bg-light border-none w-6 h-6 rounded-full cursor-pointer font-bold hover:bg-border-medium transition" onclick="changePosQty(${item.id}, 1)">+</button>
                 </div>
                 <div class="font-bold">Rp ${subtotal.toLocaleString('id-ID')}</div>
@@ -627,6 +707,22 @@ function renderPosCart() {
     if(fabCount) fabCount.textContent = posCart.reduce((total, item) => total + item.qty, 0);
 }
 
+// Fungsi input ketik langsung untuk qty di kasir POS
+function setPosQty(id, value) {
+    let item = posCart.find(i => i.id == id);
+    if (!item) return;
+    const newQty = parseInt(value);
+    if (isNaN(newQty) || newQty < 1) {
+        item.qty = 1;
+    } else if (newQty > item.stok) {
+        Swal.fire({ toast: true, position: 'top-end', icon: 'warning', title: 'Melebihi Stok!', text: `Stok tersedia hanya ${item.stok} pcs.`, showConfirmButton: false, timer: 2000 });
+        item.qty = item.stok;
+    } else {
+        item.qty = newQty;
+    }
+    renderPosCart();
+}
+
 let posGrandTotal = 0;
 
 function openModal() {
@@ -637,6 +733,8 @@ function openModal() {
     document.getElementById('modal-total-text').textContent = 'Rp ' + posGrandTotal.toLocaleString('id-ID');
     
     // Reset form modal
+    document.getElementById('modal-method').disabled = false;
+    document.getElementById('modal-method').value = 'Cash';
     document.getElementById('modal-paid').value = '';
     document.getElementById('modal-change').value = 'Rp 0';
     toggleCashInput();
@@ -653,31 +751,30 @@ function closeModal() {
 function toggleCashInput() {
     const method = document.getElementById('modal-method').value;
     const cashGroup = document.getElementById('cash-input-group');
-    
-    // Elemen tambahan untuk Non-Tunai
     const nonCashInfo = document.getElementById('non-cash-info');
-    const qrisImg = document.getElementById('qris-image');
-    const transferInfo = document.getElementById('transfer-info');
-    const instruction = document.getElementById('payment-instruction');
+    const btnSubmit = document.getElementById('btn-submit-payment');
+
+    // Kosongkan layar embed tiap ganti metode
+    nonCashInfo.innerHTML = ''; 
 
     if (method === 'Cash') {
         cashGroup.style.display = 'block';
-        nonCashInfo.style.display = 'none'; // Sembunyikan info qris/transfer
+        nonCashInfo.style.display = 'none'; 
+        if (btnSubmit) {
+            btnSubmit.style.display = 'block';
+            btnSubmit.innerHTML = 'Bayar & Simpan';
+        }
     } else {
         cashGroup.style.display = 'none';
         document.getElementById('modal-change').value = 'Rp 0';
         document.getElementById('modal-paid').value = ''; 
         
-        nonCashInfo.style.display = 'block'; // Tampilkan kotak peringatan mutasi
-
-        if (method === 'QRIS') {
-            instruction.textContent = "Silakan scan QRIS berikut:";
-            qrisImg.style.display = 'block';
-            transferInfo.style.display = 'none';
-        } else if (method === 'Transfer') {
-            instruction.textContent = "Silakan transfer ke rekening berikut:";
-            qrisImg.style.display = 'none';
-            transferInfo.style.display = 'block';
+        nonCashInfo.style.display = 'block'; 
+        nonCashInfo.innerHTML = '<p class="text-sm mb-0">Klik tombol di bawah untuk memunculkan QRIS/Transfer Bank.</p><div id="snap-container" class="mt-3"></div>';
+        
+        if (btnSubmit) {
+            btnSubmit.style.display = 'block';
+            btnSubmit.innerHTML = '<i class="fa-solid fa-qrcode"></i> Buat Kode Bayar Midtrans';
         }
     }
 }
@@ -689,10 +786,10 @@ function calculateChange() {
     
     if (change >= 0) {
         document.getElementById('modal-change').value = 'Rp ' + change.toLocaleString('id-ID');
-        document.getElementById('modal-change').style.color = '#388e3c'; // Hijau kalau cukup
+        document.getElementById('modal-change').style.color = '#388e3c'; 
     } else {
         document.getElementById('modal-change').value = 'Uang Kurang!';
-        document.getElementById('modal-change').style.color = '#d32f2f'; // Merah kalau kurang
+        document.getElementById('modal-change').style.color = '#d32f2f'; 
     }
 }
 
@@ -700,27 +797,80 @@ function submitFinalPayment() {
     const method = document.getElementById('modal-method').value;
     let paid = parseInt(document.getElementById('modal-paid').value) || 0;
     
-    // Kalau bayar cash, uang tidak boleh kurang
     if (method === 'Cash' && paid < posGrandTotal) {
         return Swal.fire({ icon: 'warning', text: 'Nominal uang yang dibayarkan kurang dari total tagihan!' });
     }
 
-    // Kalau bukan cash, anggap uang pas
-    if (method !== 'Cash') {
-        paid = posGrandTotal; 
-    }
+    let finalPaid = method === 'Cash' ? paid : posGrandTotal;
+    let change = method === 'Cash' ? paid - posGrandTotal : 0;
 
-    let change = paid - posGrandTotal;
-
-    // Masukkan data ke form tersembunyi
     document.getElementById('cart-data-input').value = JSON.stringify(posCart);
     document.getElementById('input-method').value = method;
-    document.getElementById('input-paid').value = paid;
+    document.getElementById('input-paid').value = finalPaid;
     document.getElementById('input-change').value = change;
 
-    // Submit form
-    showLoader();
-    document.getElementById('form-pos').submit();
+    if (method === 'Cash') {
+        showLoader();
+        document.getElementById('form-pos').submit();
+    } else {
+        // Mode Transfer Midtrans
+        const btnSubmit = document.getElementById('btn-submit-payment');
+        const snapContainer = document.getElementById('snap-container');
+        
+        btnSubmit.style.display = 'none';
+        document.getElementById('modal-method').disabled = true; // dropdown mati
+        
+        snapContainer.innerHTML = '<div class="text-center py-5"><i class="fa-solid fa-circle-notch fa-spin text-3xl text-primary-brown mb-3"></i><br><strong>Menghubungkan ke server Midtrans...</strong></div>';
+
+        let csrfToken = document.querySelector('meta[name="csrf-token"]');
+        
+        fetch("/kasir/proses", {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json", 
+                "Accept": "application/json", 
+                "X-CSRF-TOKEN": csrfToken.getAttribute('content') 
+            },
+            body: JSON.stringify({
+                cart_data: JSON.stringify(posCart),
+                payment_method: method,
+                amount_paid: finalPaid,
+                change_amount: change
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.snap_token) {
+                snapContainer.innerHTML = '';
+                snapContainer.style = 'width: 100%; border-radius: 10px; overflow: hidden; border: 1px solid #e0e0e0; min-height: 350px;';
+                
+                window.snap.embed(data.snap_token, {
+                    embedId: 'snap-container',
+                    onSuccess: function(result) {
+                        window.location.href = "/kasir/selesai/" + data.transaction_id;
+                    },
+                    onPending: function(result) {
+                        window.location.href = "/kasir/selesai/" + data.transaction_id;
+                    },
+                    onError: function(result) {
+                        Swal.fire({ icon: 'error', text: 'Pembayaran gagal!' });
+                        btnSubmit.style.display = 'block';
+                        document.getElementById('modal-method').disabled = false;
+                    }
+                });
+            } else {
+                snapContainer.innerHTML = '<p class="text-danger font-bold text-center">Gagal memuat token Midtrans.</p>';
+                btnSubmit.style.display = 'block';
+                document.getElementById('modal-method').disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error(error);
+            snapContainer.innerHTML = '<p class="text-danger font-bold text-center">Terjadi kesalahan koneksi server. Stok mungkin habis.</p>';
+            btnSubmit.style.display = 'block';
+            document.getElementById('modal-method').disabled = false;
+        });
+    }
 }
 
 // ==========================================
@@ -776,6 +926,14 @@ function payNow() {
         return;
     }
 
+    // Validasi No HP: hanya angka, panjang 10-13 digit
+    const regexPhone = /^[0-9]{10,13}$/;
+    if (!regexPhone.test(noHp.trim())) {
+        Swal.fire({ icon: 'warning', text: 'No HP hanya boleh berisi angka, minimal 10 dan maksimal 13 digit!' });
+        document.getElementById('nohp').focus();
+        return;
+    }
+
     // CATATAN: Kalau di form checkout biasa ini kamu JUGA punya input tanggal pengiriman (misal id-nya 'tanggal_kirim'), tambahkan juga seperti ini:
     let tanggalKirim = document.getElementById('tanggal_kirim')?.value;
     if (!tanggalKirim || tanggalKirim.trim() === "") {
@@ -796,6 +954,27 @@ function payNow() {
     if (!alamat || alamat.trim() === "") {
         Swal.fire({ icon: 'warning', text: 'Mohon isi Alamat Pengiriman!' });
         document.getElementById('alamat').focus();
+        return;
+    }
+
+    // Validasi Alamat: maksimal 300 karakter
+    if (alamat.trim().length > 300) {
+        Swal.fire({ icon: 'warning', text: 'Detail Alamat terlalu panjang! Maksimal 300 karakter.' });
+        document.getElementById('alamat').focus();
+        return;
+    }
+
+    if (noHp.trim().length > 15) {
+        Swal.fire({ icon: 'warning', text: 'Detail Alamat terlalu panjang! Maksimal 300 karakter.' });
+        document.getElementById('nohp').focus();
+        return;
+    }
+
+    // Validasi Catatan: maksimal 200 karakter (ambil nilai sekarang)
+    let catatanVal = document.getElementById('catatan')?.value || '';
+    if (catatanVal.trim().length > 200) {
+        Swal.fire({ icon: 'warning', text: 'Catatan terlalu panjang! Maksimal 200 karakter.' });
+        document.getElementById('catatan').focus();
         return;
     }
 
@@ -907,5 +1086,28 @@ window.hideLoader = function() {
     if(loader) {
         loader.classList.remove('flex');
         loader.classList.add('hidden');
+    }
+
+}
+
+// === FUNGSI PENGHITUNG KARAKTER OTOMATIS ===
+function updateCounter(inputId, counterId, max) {
+    // 1. Ambil elemen input dan elemen teks angkanya
+    const inputElement = document.getElementById(inputId);
+    const counterElement = document.getElementById(counterId);
+    
+    // 2. Hitung jumlah huruf yang sedang diketik
+    const currentLength = inputElement.value.length;
+    
+    // 3. Ubah teksnya menjadi Format: AngkaSekarang/Maksimal (Contoh: 12/100)
+    counterElement.innerText = `${currentLength}/${max}`;
+
+    // Opsional (Biar Keren): Ubah warnanya jadi merah kalau sudah penuh/maksimal
+    if (currentLength >= max) {
+        counterElement.classList.add('text-red-500');
+        counterElement.classList.remove('text-gray-500');
+    } else {
+        counterElement.classList.remove('text-red-500');
+        counterElement.classList.add('text-gray-500');
     }
 }

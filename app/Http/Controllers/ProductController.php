@@ -23,6 +23,12 @@ class ProductController extends Controller
         ->sortByDesc('total_terjual')
         ->take(4);
 
+            // foreach($products as $p) {
+            //     if($p->nama == 'Cheese Cake') { // Ganti dengan nama produk yang diminta
+            //         $p->harga = 15000; // Harga baru
+            //     }
+            // }
+
         return view('index', compact('products', 'terlaris'));
     }
 
@@ -31,6 +37,12 @@ class ProductController extends Controller
         $products = Product::where('kategori', $jenis)->get();
         $judul = 'Aneka ' . ucfirst($jenis);
         
+        // foreach($products as $p) {
+        //     if($p->nama == 'Lidah Kucing') { // Ganti dengan nama produk yang diminta
+        //         $p->harga = 15000; // Harga baru
+        //     }
+        // }
+
         return view('kategori', compact('products', 'judul'));
     }
 

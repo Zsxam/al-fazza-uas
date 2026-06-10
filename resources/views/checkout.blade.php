@@ -19,7 +19,8 @@
                     
                     <div class="flex-1 min-w-48 mb-4">
                         <label class="block mb-1.5 font-medium text-sm">No. WhatsApp *</label>
-                        <input type="tel" id="nohp" required placeholder="Contoh: 081234567890" class="form-input">
+                        <input type="tel" id="nohp" required placeholder="Contoh: 081234567890" class="form-input" maxlength="13" oninput="updateCharCount('nohp', 13)">
+                        <div class="text-right text-xs text-gray-400 mt-1"><span id="nohp-count">0</span>/13 karakter</div>
                     </div>
                 </div>
 
@@ -32,7 +33,8 @@
                 
                 <div class="mb-6">
                     <label class="block mb-1.5 font-medium text-sm">Detail Alamat Pengiriman *</label>
-                    <textarea id="alamat" rows="4" required placeholder="Isi dengan detail tambahan seperti nomor rumah, blok, nama gedung, patokan, dll." class="form-input"></textarea>
+                    <textarea id="alamat" rows="4" required maxlength="300" placeholder="Isi dengan detail tambahan seperti nomor rumah, blok, nama gedung, patokan, dll." class="form-input" oninput="updateCharCount('alamat', 300)"></textarea>
+                    <div class="text-right text-xs text-gray-400 mt-1"><span id="alamat-count">0</span>/300 karakter</div>
                 </div>
 
                 <div class="flex items-center gap-2.5 bg-green-100 p-4 rounded-lg text-success mt-5">
@@ -73,7 +75,8 @@
                 <div class="bg-primary-brown text-white p-4">
                     <h3 class="m-0 text-lg font-bold">Catatan</h3>
                 </div>
-                <textarea id="catatan" rows="3" placeholder="Tulis catatan pesanan (Opsional)" class="w-full border-none p-5 resize-none outline-none font-inherit"></textarea>
+                <textarea id="catatan" rows="3" maxlength="200" placeholder="Tulis catatan pesanan (Opsional)" class="w-full border-none p-5 resize-none outline-none font-inherit" oninput="updateCharCount('catatan', 200)"></textarea>
+                <div class="text-right text-xs text-gray-400 px-5 pb-3"><span id="catatan-count">0</span>/200 karakter</div>
             </div>
 
             <button type="button" class="w-full bg-btn-navy text-white p-4 border-none rounded-lg text-lg font-bold cursor-pointer transition-colors duration-300 hover:bg-btn-navy-hover flex justify-center items-center gap-2.5 shadow-[0_4px_6px_rgba(0,0,0,0.1)] mt-5" onclick="payNow()">
@@ -90,5 +93,14 @@
                 renderCheckoutSummary();
             }
         });
+        const noHpInput = document.getElementById('nohp');
+
+        if (noHpInput) {
+            // Event 'input' berjalan setiap kali ada karakter yang diketik
+            noHpInput.addEventListener("input", function (e) {
+                // Hapus SEMUA karakter selain angka (0-9) secara instan
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        }
     </script>
 @endsection

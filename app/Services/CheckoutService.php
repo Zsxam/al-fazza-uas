@@ -98,8 +98,7 @@ class CheckoutService
             }
 
             $snapToken = null;
-            if ($orderType !== 'kasir') {
-                
+            if ($orderType !== 'kasir' || $paymentMethod !== 'Cash') {
                 $this->configureMidtrans();
 
                 $params = [
